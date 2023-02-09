@@ -27,7 +27,8 @@ public class CarService {
             new Car("Honda", "Civic", 200, 35000),
             new Car("Tesla", "Model 3", 350, 55000),
             new Car("Ford", "Mustang", 580, 32000),
-            new Car("Chevrolet", "Corvette", 480, 75000)
+            new Car("Chevrolet", "Corvette", 480, 75000),
+            new Car("Opel", "Kadett", 780, 25400)
         });
     }
 
