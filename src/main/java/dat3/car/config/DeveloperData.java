@@ -62,5 +62,6 @@ public class DeveloperData implements ApplicationRunner {
     carRepository.save(new Car("Tesla", "Model 3", 350, 55000));
     carRepository.save(new Car("Ford", "Mustang", 580, 32000));
     carRepository.save(new Car("Chevrolet", "Corvette", 480, 75000));
+    carRepository.save(new Car("Opel", "Kadett", 780, 25400));
   }
 }
