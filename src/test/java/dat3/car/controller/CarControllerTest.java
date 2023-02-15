@@ -94,6 +94,7 @@ public class CarControllerTest {
 
 	@Test
 	void testUpdate() throws Exception {
+		carRequestSamples.get(0).setId(carSamples.get(0).getId());
 		carRequestSamples.get(0).setBestDiscount(99999);
 
 		mockMvc.perform(patch("/api/v1/cars")
@@ -102,7 +103,8 @@ public class CarControllerTest {
 					.characterEncoding("utf-8"))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.bestDiscount", is(carRequestSamples.get(0).getBestDiscount())));
+				.andExpect(jsonPath("$.bestDiscount", is(carRequestSamples.get(0).getBestDiscount())))
+				.andExpect(jsonPath("$.id", is(carRequestSamples.get(0).getId())));
 	}
 
 	@Test

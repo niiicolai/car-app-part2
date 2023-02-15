@@ -101,7 +101,8 @@ public class MemberControllerTest {
 					.characterEncoding("utf-8"))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.city", is(memberRequestSamples.get(0).getCity())));
+				.andExpect(jsonPath("$.city", is(memberRequestSamples.get(0).getCity())))
+				.andExpect(jsonPath("$.username", is(memberRequestSamples.get(0).getUsername())));
 	}
 
 	@Test

@@ -76,8 +76,8 @@ public class ReservationControllerTest {
 			reservationRequestSamples.get(i).setCarId(car.getId());
 		}
 
-        reservationRepository.save(reservationSamples.get(0));
-        reservationRepository.save(reservationSamples.get(1));
+        reservationSamples.get(0).setId(reservationRepository.save(reservationSamples.get(0)).getId());
+        reservationSamples.get(1).setId(reservationRepository.save(reservationSamples.get(1)).getId());
 	}
 
     @AfterAll
@@ -120,6 +120,7 @@ public class ReservationControllerTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
         LocalDateTime dateTime = LocalDateTime.parse("2012-12-12 10:10:10.1", formatter);
 		reservationRequestSamples.get(0).setRentalDate(dateTime);
+		reservationRequestSamples.get(0).setId(reservationSamples.get(0).getId());
 
 		mockMvc.perform(patch("/api/v1/reservations")
 					.content(objectMapper.writeValueAsString(reservationRequestSamples.get(0)))
@@ -127,7 +128,8 @@ public class ReservationControllerTest {
 					.characterEncoding("utf-8"))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.rentalDate", is(reservationRequestSamples.get(0).getRentalDate().format(formatter))));
+				.andExpect(jsonPath("$.rentalDate", is(reservationRequestSamples.get(0).getRentalDate().format(formatter))))
+				.andExpect(jsonPath("$.id", is(reservationRequestSamples.get(0).getId())));
 	}
 
 	@Test

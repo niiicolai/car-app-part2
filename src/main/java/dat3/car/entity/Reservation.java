@@ -40,4 +40,11 @@ public class Reservation {
         this.car = car;
         this.rentalDate = rentalDate;
     }
+
+    public Reservation(int id, Member member, Car car, LocalDateTime rentalDate) {
+        this.id = id;
+        this.member = member;
+        this.car = car;
+        this.rentalDate = rentalDate;
+    }
 }

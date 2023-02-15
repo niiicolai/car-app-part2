@@ -1,11 +1,12 @@
 package dat3.car.service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import dat3.car.dto.car.CarRequest;
 import dat3.car.dto.car.CarResponse;
@@ -28,6 +29,8 @@ public class CarService {
 
     public CarResponse find(int id) {
         Optional<Car> carOpt = carRepository.findById(id);
+        if (carOpt.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car with <ID> doesn't exist!");
 
         return new CarResponse(carOpt.get());
     }
@@ -38,11 +41,25 @@ public class CarService {
     }
 
     public CarResponse update(CarRequest carRequest) {
-        Car car = carRepository.save(carRequest.toCar());
+        Optional<Car> carOpt = carRepository.findById(carRequest.getId());
+        if (carOpt.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car with <ID> doesn't exist!");
+        
+        Car car = carOpt.get();
+        car.setBrand(carRequest.getBrand());
+        car.setModel(carRequest.getModel());
+        car.setBestDiscount(carRequest.getBestDiscount());
+        car.setPricePrDay(carRequest.getPricePrDay());
+        car = carRepository.save(car);
+
         return new CarResponse(car);
     }
 
     public void delete(int id) {
-        carRepository.deleteById(id);
+        Optional<Car> carOpt = carRepository.findById(id);
+        if (carOpt.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car with <ID> doesn't exist!");
+
+        carRepository.delete(carOpt.get());
     }
 }

@@ -9,7 +9,6 @@ import dat3.car.dto.car.CarResponse;
 import dat3.car.entity.Car;
 import dat3.car.repository.CarRepository;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,6 +17,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
@@ -87,7 +87,7 @@ public class CarServiceTest {
 	void testDelete() {
 		carService.delete(carSamples.get(0).getId());
 
-		assertThrows(NoSuchElementException.class, () -> {
+		assertThrows(ResponseStatusException.class, () -> {
 			carService.find(carSamples.get(0).getId());
 		});
 	}

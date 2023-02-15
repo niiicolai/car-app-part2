@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,6 +12,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import dat3.car.config.SampleTestConfig;
@@ -85,7 +85,7 @@ public class MemberServiceTest {
     void testDelete() {
         memberService.delete(memberSamples.get(0).getUsername());
 
-        assertThrows(NoSuchElementException.class, () -> {
+        assertThrows(ResponseStatusException.class, () -> {
 			memberService.find(memberSamples.get(0).getUsername());
 		});
     }

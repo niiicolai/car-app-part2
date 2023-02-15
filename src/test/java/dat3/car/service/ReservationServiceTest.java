@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import dat3.car.config.SampleTestConfig;
@@ -110,7 +110,7 @@ public class ReservationServiceTest {
     void testDelete() {
         reservationService.delete(reservationSamples.get(0).getId());
 
-        assertThrows(NoSuchElementException.class, () -> {
+        assertThrows(ResponseStatusException.class, () -> {
 			reservationService.find(reservationSamples.get(0).getId());
 		});
     }
