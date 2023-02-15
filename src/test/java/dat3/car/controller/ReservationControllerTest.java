@@ -3,7 +3,6 @@ package dat3.car.controller;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -15,22 +14,22 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.context.annotation.Import;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dat3.car.api.ReservationController;
-import dat3.car.config.DeveloperData;
-import dat3.car.dto.ReservationRequest;
+import dat3.car.config.ObjectMapperConfig;
+import dat3.car.config.SampleTestConfig;
+import dat3.car.dto.reservation.ReservationRequest;
 import dat3.car.entity.Reservation;
+import dat3.car.entity.Member;
+import dat3.car.entity.Car;
 import dat3.car.repository.CarRepository;
 import dat3.car.repository.MemberRepository;
 import dat3.car.repository.ReservationRepository;
@@ -38,6 +37,7 @@ import dat3.car.service.ReservationService;
 
 @DataJpaTest
 @TestInstance(Lifecycle.PER_CLASS)
+@Import({SampleTestConfig.class, ObjectMapperConfig.class})
 public class ReservationControllerTest {
     
     @Autowired
@@ -47,36 +47,44 @@ public class ReservationControllerTest {
 	MemberRepository memberRepository;
 
     @Autowired
-	CarRepository carRepository;
+	CarRepository carRepository;	
+    
+	@Autowired 
+    List<Reservation> reservationSamples;
 
-    @Autowired
-    DeveloperData developerData;
+	@Autowired 
+    List<ReservationRequest> reservationRequestSamples;
 
-	ReservationService service;
-
-    ReservationController controller;
-
-    List<ReservationRequest> sampleRequests;
-
-	List<Reservation> samples;
+	@Autowired 
+	ObjectMapper objectMapper;
 
     MockMvc mockMvc;
 
 	@BeforeAll
 	void beforeAll() {
-		service = new ReservationService(reservationRepository, memberRepository, carRepository);
-        controller = new ReservationController(service);
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        samples = developerData.reservationSamples();
-        sampleRequests = samples.stream().map(r -> new ReservationRequest(r)).collect(Collectors.toList());
+		ReservationService reservationService = new ReservationService(reservationRepository, 
+			memberRepository, carRepository);
+        ReservationController reservationController = new ReservationController(reservationService);
+        mockMvc = MockMvcBuilders.standaloneSetup(reservationController).build();
 
-        reservationRepository.save(samples.get(0));
-        reservationRepository.save(samples.get(1));
+		for (int i = 0; i < reservationSamples.size(); i++) {
+			Car car = carRepository.save(reservationSamples.get(i).getCar());
+			Member member = memberRepository.save(reservationSamples.get(i).getMember());
+			
+			reservationSamples.get(i).setCar(car);
+			reservationSamples.get(i).setMember(member);
+			reservationRequestSamples.get(i).setCarId(car.getId());
+		}
+
+        reservationRepository.save(reservationSamples.get(0));
+        reservationRepository.save(reservationSamples.get(1));
 	}
 
     @AfterAll
     void afterAll() {
-        reservationRepository.deleteAll();
+		reservationRepository.deleteAll();
+		carRepository.deleteAll();
+		memberRepository.deleteAll();        
     }
     
 	@Test
@@ -85,48 +93,47 @@ public class ReservationControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(2)))
-				.andExpect(jsonPath("$.[0].carBrand", is(samples.get(0).getCar().getBrand())));
+				.andExpect(jsonPath("$.[0].carBrand", is(reservationSamples.get(0).getCar().getBrand())));
 	}
 
     @Test
 	void testFind() throws Exception {
-        mockMvc.perform(get(String.format("/api/v1/reservations/%s", samples.get(0).getId())))
+        mockMvc.perform(get(String.format("/api/v1/reservations/%s", reservationSamples.get(0).getId())))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.carBrand", is(samples.get(0).getCar().getBrand())));
+				.andExpect(jsonPath("$.carBrand", is(reservationSamples.get(0).getCar().getBrand())));
 	}
 
 	@Test
 	void testCreate() throws Exception {
 		mockMvc.perform(post("/api/v1/reservations")
-					.content(new ObjectMapper().writeValueAsString(sampleRequests.get(2)))
+					.content(objectMapper.writeValueAsString(reservationRequestSamples.get(2)))
 	                .contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding("utf-8"))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.carBrand", is(samples.get(2).getCar().getBrand())));
+				.andExpect(jsonPath("$.carBrand", is(reservationSamples.get(2).getCar().getBrand())));
 	}
 
 	@Test
 	void testUpdate() throws Exception {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime dateTime = LocalDateTime.parse("2012-12-12 10:10:10.10", formatter);
-		sampleRequests.get(0).setRentalDate(dateTime);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        LocalDateTime dateTime = LocalDateTime.parse("2012-12-12 10:10:10.1", formatter);
+		reservationRequestSamples.get(0).setRentalDate(dateTime);
 
 		mockMvc.perform(patch("/api/v1/reservations")
-					.content(new ObjectMapper().writeValueAsString(sampleRequests.get(0)))
+					.content(objectMapper.writeValueAsString(reservationRequestSamples.get(0)))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding("utf-8"))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.rentalDate", is(sampleRequests.get(0).getRentalDate())));
+				.andExpect(jsonPath("$.rentalDate", is(reservationRequestSamples.get(0).getRentalDate().format(formatter))));
 	}
 
 	@Test
 	void testDelete() throws Exception {
-		mockMvc.perform(delete(String.format("/api/v1/reservations/%s", samples.get(0).getId())))
+		mockMvc.perform(delete(String.format("/api/v1/reservations/%s", reservationSamples.get(0).getId())))
                 .andDo(print())
                 .andExpect(status().isOk());
 	}
-
 }

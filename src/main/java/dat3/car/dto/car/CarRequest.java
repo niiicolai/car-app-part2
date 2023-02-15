@@ -1,4 +1,4 @@
-package dat3.car.dto;
+package dat3.car.dto.car;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dat3.car.entity.Car;

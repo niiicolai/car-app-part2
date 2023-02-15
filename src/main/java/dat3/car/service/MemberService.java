@@ -1,16 +1,13 @@
 package dat3.car.service;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import dat3.car.dto.MemberRequest;
-import dat3.car.dto.MemberResponse;
+import dat3.car.dto.member.MemberRequest;
+import dat3.car.dto.member.MemberResponse;
 import dat3.car.entity.Member;
 import dat3.car.repository.MemberRepository;
 
@@ -21,33 +18,6 @@ public class MemberService {
 
     public MemberService(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
-    }
-
-    public List<Member> sampleMembers() {
-        var members = Arrays.asList(new Member[] {
-            new Member("user1", "pass1", "user1@email.com", "John", "Doe", "123 Main St", "New York", "10001"),
-            new Member("user2", "pass2", "user2@email.com", "Jane", "Smith", "456 Elm St", "Los Angeles", "90001"),
-            new Member("user3", "pass3", "user3@email.com", "Bob", "Johnson", "789 Oak St", "Chicago", "60601"),
-            new Member("user4", "pass4", "user4@email.com", "Emily", "Brown", "246 Pine St", "Houston", "77001"),
-            new Member("user5", "pass5", "user5@email.com", "Michael", "Davis", "369 Cedar St", "Phoenix", "85001")
-        });
-
-        String[] favoriteCarColors = {"green", "red", "blue"};
-
-        Map<String,String> phones = new HashMap<>();
-        phones.put("work", "555-555-5555");
-        phones.put("home", "555-555-1234");
-        phones.put("mobile", "555-555-4321");
-
-        for (Member member : members) {
-            member.setFavoriteCarColors(Arrays.asList(favoriteCarColors));
-            member.setPhones(phones);
-        }
-        return members;
-    }
-
-    public List<MemberRequest> sampleRequests() {
-        return sampleMembers().stream().map(member -> new MemberRequest(member)).collect(Collectors.toList());
     }
     
     public List<MemberResponse> findAll() {

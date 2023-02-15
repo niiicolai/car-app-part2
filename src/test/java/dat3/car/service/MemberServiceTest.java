@@ -12,78 +12,81 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import dat3.car.dto.MemberRequest;
-import dat3.car.dto.MemberResponse;
+import dat3.car.config.SampleTestConfig;
+import dat3.car.dto.member.MemberRequest;
+import dat3.car.dto.member.MemberResponse;
 import dat3.car.entity.Member;
 import dat3.car.repository.MemberRepository;
 
 @DataJpaTest
 @TestInstance(Lifecycle.PER_CLASS)
+@Import(SampleTestConfig.class)
 public class MemberServiceTest {
 
     @Autowired 
-    MemberRepository repository;
+    MemberRepository memberRepository;
 
-    MemberService service;
-
-    List<Member> samples;
+    @Autowired 
+    List<Member> memberSamples;
     
-    List<MemberRequest> sampleRequests;
+    @Autowired 
+    List<MemberRequest> memberRequestSamples;
+
+    MemberService memberService;
 
     @BeforeAll
     void beforeAll() {
-        service = new MemberService(repository);
-        samples = service.sampleMembers();
-        sampleRequests = service.sampleRequests();
+        memberService = new MemberService(memberRepository);
 
-        repository.save(samples.get(0));
-        repository.save(samples.get(1));
+        memberRepository.save(memberSamples.get(0));
+        memberRepository.save(memberSamples.get(1));
     }
 
     @AfterAll
     void afterAll() {
-        repository.deleteAll();
+        memberRepository.deleteAll();
     }
     
     @Test
     void testFindAll() {
-        List<MemberResponse> responses = service.findAll();
+        List<MemberResponse> responses = memberService.findAll();
         
         assertEquals(2, responses.size());
     }
 
     @Test
     void testFind() {
-        MemberResponse response = service.find(samples.get(0).getUsername());
+        MemberResponse response = memberService.find(memberSamples.get(0).getUsername());
 
-        assertEquals(samples.get(0).getUsername(), response.getUsername());
+        assertEquals(memberSamples.get(0).getUsername(), response.getUsername());
     }
 
     @Test
     void testCreate() {
-        service.create(sampleRequests.get(2));
+        memberService.create(memberRequestSamples.get(2));
 
-        MemberResponse response = service.find(samples.get(2).getUsername());
-        assertEquals(samples.get(2).getUsername(), response.getUsername());
+        MemberResponse response = memberService.find(memberSamples.get(2).getUsername());
+        assertEquals(memberSamples.get(2).getUsername(), response.getUsername());
     }
 
     @Test
     void testUpdate() {
-        sampleRequests.get(0).setCity("Houston");
-        service.update(sampleRequests.get(0));
+        memberRequestSamples.get(0).setCity("Houston");
+        memberService.update(memberRequestSamples.get(0));
 
-        MemberResponse response = service.find(samples.get(0).getUsername());
-        assertEquals(sampleRequests.get(0).getCity(), response.getCity());
+        MemberResponse response = memberService.find(memberSamples.get(0).getUsername());
+        assertEquals(memberRequestSamples.get(0).getCity(), response.getCity());
     }
 
     @Test
     void testDelete() {
-        service.delete(samples.get(0).getUsername());
+        memberService.delete(memberSamples.get(0).getUsername());
 
         assertThrows(NoSuchElementException.class, () -> {
-			service.find(samples.get(0).getUsername());
+			memberService.find(memberSamples.get(0).getUsername());
 		});
     }
 }

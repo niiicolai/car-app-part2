@@ -1,4 +1,4 @@
-package dat3.car.dto;
+package dat3.car.dto.member;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import dat3.car.dto.reservation.ReservationResponse;
 import dat3.car.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

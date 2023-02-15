@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import dat3.car.dto.CarRequest;
-import dat3.car.dto.CarResponse;
+import dat3.car.dto.car.CarRequest;
+import dat3.car.dto.car.CarResponse;
 import dat3.car.entity.Car;
 import dat3.car.repository.CarRepository;
 
@@ -19,21 +19,6 @@ public class CarService {
 
     public CarService(CarRepository carRepository) {
         this.carRepository = carRepository;
-    }
-
-    public List<Car> sampleCars() {
-        return Arrays.asList(new Car[] {
-            new Car("Toyota", "Camry", 150, 40000),
-            new Car("Honda", "Civic", 200, 35000),
-            new Car("Tesla", "Model 3", 350, 55000),
-            new Car("Ford", "Mustang", 580, 32000),
-            new Car("Chevrolet", "Corvette", 480, 75000),
-            new Car("Opel", "Kadett", 780, 25400)
-        });
-    }
-
-    public List<CarRequest> sampleRequests() {
-        return sampleCars().stream().map(car -> new CarRequest(car)).collect(Collectors.toList());
     }
     
     public List<CarResponse> findAll() {

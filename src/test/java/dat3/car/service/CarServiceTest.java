@@ -3,8 +3,9 @@ package dat3.car.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import dat3.car.dto.CarRequest;
-import dat3.car.dto.CarResponse;
+import dat3.car.config.SampleTestConfig;
+import dat3.car.dto.car.CarRequest;
+import dat3.car.dto.car.CarResponse;
 import dat3.car.entity.Car;
 import dat3.car.repository.CarRepository;
 import java.util.List;
@@ -16,76 +17,78 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
 @TestInstance(Lifecycle.PER_CLASS)
+@Import(SampleTestConfig.class)
 public class CarServiceTest {
 
 	@Autowired
-	CarRepository repository;
+	CarRepository carRepository;	
 
-	CarService service;
-
-	List<Car> samples;
+	@Autowired 
+    List<Car> carSamples;
 	
-	List<CarRequest> sampleRequests;
+	@Autowired 
+	List<CarRequest> carRequestSamples;
+
+	CarService carService;
 
 	@BeforeAll
 	void beforeAll() {
-		service = new CarService(repository);
-		samples = service.sampleCars();
-		sampleRequests = service.sampleRequests();
+		carService = new CarService(carRepository);
 
-		samples.get(0).setId(repository.save(samples.get(0)).getId());
-		samples.get(1).setId(repository.save(samples.get(1)).getId());
+		carSamples.get(0).setId(carRepository.save(carSamples.get(0)).getId());
+		carSamples.get(1).setId(carRepository.save(carSamples.get(1)).getId());
 	}
 
 	@AfterAll
     void afterAll() {
-        repository.deleteAll();
+        carRepository.deleteAll();
     }
 
 	@Test
 	void testFindAll() {
-		List<CarResponse> responses = service.findAll();
+		List<CarResponse> responses = carService.findAll();
 
 		assertEquals(2, responses.size());
 	}
 
 	@Test
 	void testFind() {
-		CarResponse response = service.find(samples.get(0).getId());
+		CarResponse response = carService.find(carSamples.get(0).getId());
 
-		assertEquals(samples.get(0).getBrand(), response.getBrand());
+		assertEquals(carSamples.get(0).getBrand(), response.getBrand());
 	}
 
 	@Test
 	void testCreate() {
-		CarResponse response = service.create(sampleRequests.get(2));
+		CarResponse response = carService.create(carRequestSamples.get(2));
 
-		assertEquals(samples.get(2).getBrand(), response.getBrand());
+		assertEquals(carSamples.get(2).getBrand(), response.getBrand());
 	}
 
 	@Test
 	void testUpdate() {
-		sampleRequests.get(0).setId(samples.get(0).getId());
-		sampleRequests.get(0).setPricePrDay(55500);
+		carRequestSamples.get(0).setId(carSamples.get(0).getId());
+		carRequestSamples.get(0).setPricePrDay(55500);
 
-		CarResponse response = service.update(sampleRequests.get(0));
+		CarResponse response = carService.update(carRequestSamples.get(0));
 
 		assertEquals(
-			sampleRequests.get(0).getPricePrDay(),
+			carRequestSamples.get(0).getPricePrDay(),
 			response.getPricePrDay()
 		);
 	}
 
 	@Test
 	void testDelete() {
-		service.delete(samples.get(0).getId());
+		carService.delete(carSamples.get(0).getId());
 
 		assertThrows(NoSuchElementException.class, () -> {
-			service.find(samples.get(0).getId());
+			carService.find(carSamples.get(0).getId());
 		});
 	}
 }

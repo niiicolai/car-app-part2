@@ -1,4 +1,4 @@
-package dat3.car.dto;
+package dat3.car.dto.reservation;
 
 import java.time.LocalDateTime;
 

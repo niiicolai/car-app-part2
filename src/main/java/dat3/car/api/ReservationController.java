@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
-import dat3.car.dto.ReservationRequest;
-import dat3.car.dto.ReservationResponse;
+import dat3.car.dto.reservation.ReservationRequest;
+import dat3.car.dto.reservation.ReservationResponse;
 import dat3.car.service.ReservationService;
 
 @RestController

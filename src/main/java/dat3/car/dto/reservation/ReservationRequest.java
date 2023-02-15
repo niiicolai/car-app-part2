@@ -1,12 +1,10 @@
-package dat3.car.dto;
+package dat3.car.dto.reservation;
 
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import dat3.car.entity.Car;
-import dat3.car.entity.Member;
 import dat3.car.entity.Reservation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +18,9 @@ import lombok.Setter;
 public class ReservationRequest {
 
     @JsonProperty
+    private int id;
+
+    @JsonProperty
     private String memberUsername;
 
     @JsonProperty
@@ -29,6 +30,7 @@ public class ReservationRequest {
     private LocalDateTime rentalDate;
 
     public ReservationRequest(Reservation reservation) {
+        id = reservation.getId();
         memberUsername = reservation.getMember().getUsername();
         carId = reservation.getCar().getId();
         rentalDate = reservation.getRentalDate();

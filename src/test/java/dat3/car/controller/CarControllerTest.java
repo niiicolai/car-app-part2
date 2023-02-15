@@ -18,47 +18,50 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.context.annotation.Import;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import dat3.car.config.ObjectMapperConfig;
+import dat3.car.config.SampleTestConfig;
+import dat3.car.dto.car.CarRequest;
 import dat3.car.api.CarController;
-import dat3.car.dto.CarRequest;
 import dat3.car.entity.Car;
 import dat3.car.repository.CarRepository;
 import dat3.car.service.CarService;
 
 @DataJpaTest
 @TestInstance(Lifecycle.PER_CLASS)
-public class CarControllerTest {
-    
+@Import({SampleTestConfig.class, ObjectMapperConfig.class})
+public class CarControllerTest {    
+
     @Autowired
-	CarRepository repository;
+	CarRepository carRepository;	
 
-	CarService service;
+    @Autowired 
+    List<Car> carSamples;
+	
+	@Autowired 
+	List<CarRequest> carRequestSamples;
 
-    CarController controller;
-
-    List<CarRequest> sampleRequests;
-
-	List<Car> samples;
+	@Autowired 
+	ObjectMapper objectMapper;
 
     MockMvc mockMvc;
 
 	@BeforeAll
 	void beforeAll() {
-		service = new CarService(repository);
-        controller = new CarController(service);
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-		samples = service.sampleCars();
-        sampleRequests = service.sampleRequests();
+		CarService carService = new CarService(carRepository);
+        CarController carController = new CarController(carService);
+        mockMvc = MockMvcBuilders.standaloneSetup(carController).build();
 
-        samples.get(0).setId(repository.save(samples.get(0)).getId());
-        samples.get(1).setId(repository.save(samples.get(1)).getId());
+        carSamples.get(0).setId(carRepository.save(carSamples.get(0)).getId());
+        carSamples.get(1).setId(carRepository.save(carSamples.get(1)).getId());
 	}
 
     @AfterAll
     void afterAll() {
-        repository.deleteAll();
+        carRepository.deleteAll();
     }
     
 	@Test
@@ -67,44 +70,44 @@ public class CarControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(2)))
-				.andExpect(jsonPath("$.[0].brand", is(samples.get(0).getBrand())));
+				.andExpect(jsonPath("$.[0].brand", is(carSamples.get(0).getBrand())));
 	}
 
     @Test
 	void testFind() throws Exception {
-        mockMvc.perform(get(String.format("/api/v1/cars/%s", samples.get(0).getId())))
+        mockMvc.perform(get(String.format("/api/v1/cars/%s", carSamples.get(0).getId())))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.brand", is(samples.get(0).getBrand())));
+				.andExpect(jsonPath("$.brand", is(carSamples.get(0).getBrand())));
 	}
 
 	@Test
 	void testCreate() throws Exception {
 		mockMvc.perform(post("/api/v1/cars")
-					.content(new ObjectMapper().writeValueAsString(sampleRequests.get(2)))
+					.content(objectMapper.writeValueAsString(carRequestSamples.get(2)))
 	                .contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding("utf-8"))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.brand", is(samples.get(2).getBrand())));
+				.andExpect(jsonPath("$.brand", is(carSamples.get(2).getBrand())));
 	}
 
 	@Test
 	void testUpdate() throws Exception {
-		sampleRequests.get(0).setBestDiscount(99999);
+		carRequestSamples.get(0).setBestDiscount(99999);
 
 		mockMvc.perform(patch("/api/v1/cars")
-					.content(new ObjectMapper().writeValueAsString(sampleRequests.get(0)))
+					.content(objectMapper.writeValueAsString(carRequestSamples.get(0)))
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding("utf-8"))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.bestDiscount", is(sampleRequests.get(0).getBestDiscount())));
+				.andExpect(jsonPath("$.bestDiscount", is(carRequestSamples.get(0).getBestDiscount())));
 	}
 
 	@Test
 	void testDelete() throws Exception {
-		mockMvc.perform(delete(String.format("/api/v1/cars/%s", samples.get(0).getId())))
+		mockMvc.perform(delete(String.format("/api/v1/cars/%s", carSamples.get(0).getId())))
                 .andDo(print())
                 .andExpect(status().isOk());
 	}

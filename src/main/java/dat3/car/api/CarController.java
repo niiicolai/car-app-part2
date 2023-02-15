@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
-import dat3.car.dto.CarRequest;
-import dat3.car.dto.CarResponse;
+import dat3.car.dto.car.CarRequest;
+import dat3.car.dto.car.CarResponse;
 import dat3.car.service.CarService;
 
 @RestController

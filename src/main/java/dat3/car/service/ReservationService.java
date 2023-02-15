@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import dat3.car.dto.ReservationRequest;
-import dat3.car.dto.ReservationResponse;
+import dat3.car.dto.reservation.ReservationRequest;
+import dat3.car.dto.reservation.ReservationResponse;
 import dat3.car.entity.Car;
 import dat3.car.entity.Member;
 import dat3.car.entity.Reservation;
@@ -57,6 +57,7 @@ public class ReservationService {
         Optional<Member> member = memberRepository.findById(reservationRequest.getMemberUsername());
         Optional<Car> car = carRepository.findById(reservationRequest.getCarId());
         Reservation reservation = new Reservation(member.get(), car.get(), reservationRequest.getRentalDate());
+        reservation.setId(reservationRequest.getId());
 
         reservation = reservationRepository.save(reservation);
         return new ReservationResponse(reservation);
