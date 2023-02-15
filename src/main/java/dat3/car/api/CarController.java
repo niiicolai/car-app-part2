@@ -26,7 +26,7 @@ public class CarController {
 
     // Role: ANONYMOUS
     @GetMapping("/{id}")
-    public CarResponse find(@PathVariable("id") long id) {
+    public CarResponse find(@PathVariable("id") int id) {
         return carService.find(id);
     }
 
@@ -44,7 +44,7 @@ public class CarController {
 
     // Role: ADMIN
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") long id) {
+    public void delete(@PathVariable("id") int id) {
         carService.delete(id);
     }
 }

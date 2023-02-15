@@ -1,10 +1,12 @@
 package dat3.car.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -51,6 +53,9 @@ public class Member {
 
   @UpdateTimestamp
   private LocalDateTime lastEdited;
+
+  @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+  private List<Reservation> reservations;
 
   public Member(
     String user,

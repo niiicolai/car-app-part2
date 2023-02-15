@@ -1,11 +1,13 @@
 package dat3.car.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import dat3.car.entity.Member;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,8 +15,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class MemberResponse {
+
     @JsonProperty
     private String username;
 
@@ -36,11 +38,14 @@ public class MemberResponse {
     @JsonProperty
     private String zip;
 
-    @JsonProperty
+    @JsonFormat(pattern = "yyyy-MM-dd") 
     private LocalDateTime created;
 
-    @JsonProperty
+    @JsonFormat(pattern = "yyyy-MM-dd") 
     private LocalDateTime lastEdited;
+
+    @JsonProperty
+    private List<ReservationResponse> reservations;
 
     public MemberResponse(Member member) {
         username = member.getUsername();
@@ -52,5 +57,18 @@ public class MemberResponse {
         zip = member.getZip();
         created = member.getCreated();
         lastEdited = member.getLastEdited();
+
+        if (member.getReservations() != null &&
+            member.getReservations().size() > 0)
+            reservations = member.getReservations()
+                .stream()
+                .map(r -> ReservationResponse.builder()
+                    .id(r.getId())
+                    .carId(r.getCar().getId())
+                    .carBrand(r.getCar().getBrand())
+                    .rentalDate(r.getRentalDate())
+                    .build())
+                    .collect(Collectors.toList());
+                                
     }
 }

@@ -41,7 +41,7 @@ public class CarService {
         return cars.stream().map(car -> new CarResponse(car)).collect(Collectors.toList());
     }
 
-    public CarResponse find(long id) {
+    public CarResponse find(int id) {
         Optional<Car> carOpt = carRepository.findById(id);
 
         return new CarResponse(carOpt.get());
@@ -57,7 +57,7 @@ public class CarService {
         return new CarResponse(car);
     }
 
-    public void delete(long id) {
+    public void delete(int id) {
         carRepository.deleteById(id);
     }
 }
