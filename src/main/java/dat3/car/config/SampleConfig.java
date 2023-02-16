@@ -40,6 +40,9 @@ public class SampleConfig {
         for (Member member : members) {
             member.setFavoriteCarColors(Arrays.asList(favoriteCarColors));
             member.setPhones(phones);
+            member.setRoles(Arrays.asList(new String[] {
+                "MEMBER", "ADMIN"
+            }));
         }
 
         return members;

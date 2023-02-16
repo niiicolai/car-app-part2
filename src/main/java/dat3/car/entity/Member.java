@@ -4,31 +4,25 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+
+import dat3.security.entity.UserWithRoles;
 
 @Entity
 @NoArgsConstructor
 @Getter 
 @Setter 
-public class Member {
+public class Member extends UserWithRoles {
 
-  @Id
-  private String username;
-
-  private String password;
   private String email;
   private String firstName;
   private String lastName;
@@ -47,12 +41,6 @@ public class Member {
   @MapKeyColumn(name = "Description")
   @Column(name = "phoneNumber")
   private Map<String, String> phones = new HashMap<>();
-
-  @CreationTimestamp
-  private LocalDateTime created;
-
-  @UpdateTimestamp
-  private LocalDateTime lastEdited;
 
   @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
   private List<Reservation> reservations;
