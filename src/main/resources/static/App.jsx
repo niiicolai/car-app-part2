@@ -196,9 +196,9 @@ class CarCollection extends React.Component {
 function App() {
     return (
         <div>
-            <nav class="navbar bg-light mb-3">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1">Car Rental App</span>
+            <nav className="navbar bg-light mb-3">
+                <div className="container-fluid">
+                    <span className="navbar-brand mb-0 h1">Car Rental App</span>
                 </div>
             </nav>
 
