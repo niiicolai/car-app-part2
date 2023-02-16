@@ -58,8 +58,8 @@ class CarReservationForm extends React.Component {
             reservation: null,
             responseType: null,
             responseMsg: null,
-            rentalDateId: `car-${this.props.car.id}-rentalDate`,
-            usernameId: `car-${this.props.car.id}-username`
+            rentalDateId: `car-${this.props.prefix}-${this.props.car.id}-rentalDate`,
+            usernameId: `car-${this.props.prefix}-${this.props.car.id}-username`
         };
     }
 
@@ -166,48 +166,64 @@ class CarView extends React.Component {
                             <Reservation reservation={this.state.reservation} />
                         }
                     </div>
-                    <CarReservationForm car={this.state.car} members={this.props.members} carView={this} />
+                    <CarReservationForm car={this.state.car} members={this.props.members} carView={this} prefix={this.props.prefix} />
                 </div>
             </div>
         );
     }
 }
 
-class CarCollection extends React.Component {
+function CarCollection(props) {
+    return (
+        <div className="car-collection">
+            {props.cars.map((car, index) =>
+                <CarView key={index} car={car} members={props.members} prefix={props.prefix} />
+            )}
+        </div>
+    );
+}
+
+class App extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { cars: [], members: [] };
+        this.state = { 
+            allCars: [],
+            carsBestDiscount: [],
+            carsNoReservations: [],
+            averagePricePrDay: 0,
+            members: [] 
+        };
 
-        Api.get('/cars', (json) => this.setState({ cars: json }));
+        Api.get('/cars', (json) => this.setState({ allCars: json }));
+        Api.get('/cars/best-discount', (json) => this.setState({ carsBestDiscount: json }));
+        Api.get('/cars/no-reservations', (json) => this.setState({ carsNoReservations: json }));
+        Api.get('/cars/average-price-pr-day', (json) => this.setState({ averagePricePrDay: json }));
         Api.get('/members', (json) => this.setState({ members: json }));
     }
 
     render() {
         return (
-            <div className="car-collection">
-                {this.state.cars.map((car, index) =>
-                    <CarView key={index} car={car} members={this.state.members} />
-                )}
+            <div>
+                <nav className="navbar bg-light mb-3">
+                    <div className="container-fluid">
+                        <span className="navbar-brand mb-0 h1">Car Rental App</span>
+                        <span>Average rental price pr day: {this.state.averagePricePrDay}</span>
+                    </div>
+                </nav>
+
+                <div className="container">
+                    <h2 className="text-center">Cars with best discount</h2>
+                    <CarCollection cars={this.state.carsBestDiscount} members={this.state.members} prefix={"best-discount"} />
+                    <hr />
+                    <h2 className="text-center">Cars with no reservations</h2>
+                    <CarCollection cars={this.state.carsNoReservations} members={this.state.members} prefix={"no-reservations"} />
+                    <hr />
+                    <h2 className="text-center">All Cars</h2>
+                    <CarCollection cars={this.state.allCars} members={this.state.members} prefix={"all"} />
+                </div>
             </div>
         );
     }
-}
-
-function App() {
-    return (
-        <div>
-            <nav className="navbar bg-light mb-3">
-                <div className="container-fluid">
-                    <span className="navbar-brand mb-0 h1">Car Rental App</span>
-                </div>
-            </nav>
-
-            <div className="container">
-                <h2 className="text-center">Available Cars</h2>
-                <CarCollection />
-            </div>
-        </div>
-    );
 }
 
 const e = React.createElement;
