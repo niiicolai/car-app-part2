@@ -111,4 +111,13 @@ public class MemberControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 	}
+
+	@Test
+	void testFindAllByReservationsIsNotEmpty() throws Exception {
+		// Ideal: Add an reservation to one of the members.
+        mockMvc.perform(get("/api/v1/members/no-reservations"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(0)));
+	}
 }

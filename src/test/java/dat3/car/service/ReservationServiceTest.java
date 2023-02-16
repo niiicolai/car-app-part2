@@ -114,4 +114,14 @@ public class ReservationServiceTest {
 			reservationService.find(reservationSamples.get(0).getId());
 		});
     }
+
+    @Test
+	void findAllByMember() {
+		
+	}
+
+	@Test
+	void countByMember() {
+		
+	}
 }

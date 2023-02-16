@@ -40,6 +40,9 @@ public class CarServiceTest {
 	void beforeAll() {
 		carService = new CarService(carRepository);
 
+		// Ensure number two sample has the highest discount
+		carSamples.get(1).setBestDiscount(99999999);
+
 		carSamples.get(0).setId(carRepository.save(carSamples.get(0)).getId());
 		carSamples.get(1).setId(carRepository.save(carSamples.get(1)).getId());
 	}
@@ -90,5 +93,43 @@ public class CarServiceTest {
 		assertThrows(ResponseStatusException.class, () -> {
 			carService.find(carSamples.get(0).getId());
 		});
+	}
+
+	@Test
+	void testFindAllByBrandAndModel() {
+		List<CarResponse> responses = carService.findAllByBrandAndModel(
+			carSamples.get(0).getBrand(), carSamples.get(0).getModel()
+		);
+
+		assertEquals(1, responses.size());
+		assertEquals(carSamples.get(0).getBrand(), responses.get(0).getBrand());
+		assertEquals(carSamples.get(0).getModel(), responses.get(0).getModel());
+	}
+
+	@Test
+	void testFindAveragePricePrDay() {
+		double expectedAverage = 0;
+        expectedAverage += carSamples.get(0).getPricePrDay();
+		expectedAverage += carSamples.get(1).getPricePrDay();
+        expectedAverage /= 2;
+		double average = carRepository.findAveragePricePrDay();
+
+		assertEquals(expectedAverage, average);
+	}
+
+	@Test
+	void testFindAllWithBestDiscount() {
+		List<CarResponse> responses = carService.findAllWithBestDiscount();
+
+		assertEquals(1, responses.size());
+		assertEquals(carSamples.get(1).getId(), responses.get(0).getId());
+	}
+
+	@Test
+	void testFindAllByReservationsIsEmpty() {
+		// Ideal: Add an reservation to one of the cars.
+		List<CarResponse> responses = carService.findAllByReservationsIsEmpty();
+
+		assertEquals(2, responses.size());
 	}
 }

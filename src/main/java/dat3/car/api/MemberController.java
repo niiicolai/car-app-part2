@@ -47,4 +47,10 @@ public class MemberController {
     public void delete(@PathVariable("username") String username) {
         memberService.delete(username);
     }
+
+    // Role: ADMIN
+    @GetMapping("/no-reservations")
+    public List<MemberResponse> findAllByReservationsIsNotEmpty() {
+        return memberService.findAllByReservationsIsNotEmpty();
+    }
 }

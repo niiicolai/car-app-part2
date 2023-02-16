@@ -55,6 +55,9 @@ public class CarControllerTest {
         CarController carController = new CarController(carService);
         mockMvc = MockMvcBuilders.standaloneSetup(carController).build();
 
+		// Ensure number two sample has the highest discount
+		carSamples.get(1).setBestDiscount(99999999);
+
         carSamples.get(0).setId(carRepository.save(carSamples.get(0)).getId());
         carSamples.get(1).setId(carRepository.save(carSamples.get(1)).getId());
 	}
@@ -112,5 +115,49 @@ public class CarControllerTest {
 		mockMvc.perform(delete(String.format("/api/v1/cars/%s", carSamples.get(0).getId())))
                 .andDo(print())
                 .andExpect(status().isOk());
+	}
+
+	@Test
+	void testFindAllByBrandAndModel() throws Exception {
+		String url = String.format("/api/v1/cars/by/%s/%s", carSamples.get(0).getBrand(), carSamples.get(0).getModel());
+		mockMvc.perform(get(url))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(1)))
+				.andExpect(jsonPath("$.[0].brand", is(carSamples.get(0).getBrand())))
+				.andExpect(jsonPath("$.[0].model", is(carSamples.get(0).getModel())));
+	}
+
+	@Test
+	void testFindAveragePricePrDay() throws Exception {
+		double expectedAverage = 0;
+        expectedAverage += carSamples.get(0).getPricePrDay();
+		expectedAverage += carSamples.get(1).getPricePrDay();
+        expectedAverage /= 2;
+		mockMvc.perform(get("/api/v1/cars/average-price-pr-day"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(expectedAverage)));
+	}
+
+	@Test
+	void testFindAllWithBestDiscount() throws Exception {
+		mockMvc.perform(get("/api/v1/cars/best-discount"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(1)))
+				.andExpect(jsonPath("$.[0].brand", is(carSamples.get(1).getBrand())))
+				.andExpect(jsonPath("$.[0].model", is(carSamples.get(1).getModel())));
+	}
+
+	@Test
+	void testFindAllByReservationsIsEmpty() throws Exception {
+		// Ideal: Add an reservation to one of the cars.
+		mockMvc.perform(get("/api/v1/cars/no-reservations"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(2)))
+				.andExpect(jsonPath("$.[0].brand", is(carSamples.get(0).getBrand())))
+				.andExpect(jsonPath("$.[0].model", is(carSamples.get(0).getModel())));
 	}
 }

@@ -1,6 +1,5 @@
 package dat3.car.service;
 
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -82,5 +81,22 @@ public class ReservationService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation with <ID> doesn't exist!");
 
         reservationRepository.delete(reservationOpt.get());
+    }
+
+    public List<ReservationResponse> findAllByMember(String username) {
+        Optional<Member> memberOpt = memberRepository.findById(username);
+        if (memberOpt.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member with <USERNAME> doesn't exist!");
+
+        List<Reservation> reservations = reservationRepository.findAllByMember(memberOpt.get());
+        return reservations.stream().map(reservation -> new ReservationResponse(reservation)).collect(Collectors.toList());
+    }
+
+    public int countByMember(String username) {
+        Optional<Member> memberOpt = memberRepository.findById(username);
+        if (memberOpt.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member with <USERNAME> doesn't exist!");
+
+        return reservationRepository.countByMember(memberOpt.get());
     }
 }

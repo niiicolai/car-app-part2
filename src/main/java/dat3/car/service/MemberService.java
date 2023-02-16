@@ -67,4 +67,9 @@ public class MemberService {
 
         memberRepository.delete(memberOpt.get());
     }
+
+    public List<MemberResponse> findAllByReservationsIsNotEmpty() {
+        List<Member> members = memberRepository.findAllByReservationsIsNotEmpty();
+        return members.stream().map(member -> new MemberResponse(member)).collect(Collectors.toList());
+    }
 }

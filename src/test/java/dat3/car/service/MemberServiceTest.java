@@ -89,4 +89,11 @@ public class MemberServiceTest {
 			memberService.find(memberSamples.get(0).getUsername());
 		});
     }
+
+    @Test
+	void testFindAllByReservationsIsNotEmpty() {
+        List<MemberResponse> responses = memberService.findAllByReservationsIsNotEmpty();
+        
+        assertEquals(0, responses.size());
+	}
 }

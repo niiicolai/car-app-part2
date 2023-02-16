@@ -47,4 +47,29 @@ public class CarController {
     public void delete(@PathVariable("id") int id) {
         carService.delete(id);
     }
+
+    // Role: ANONYMOUS
+    @GetMapping("/by/{brand}/{model}")
+    public List<CarResponse> findAllByBrandAndModel(@PathVariable("brand") String brand, 
+            @PathVariable("model") String model) {
+        return carService.findAllByBrandAndModel(brand, model);
+    }
+
+    // Role: ANONYMOUS
+    @GetMapping("/average-price-pr-day")
+    public Double findAveragePricePrDay() {
+        return carService.findAveragePricePrDay();
+    }
+    
+    // Role: ANONYMOUS
+    @GetMapping("/best-discount")
+    public List<CarResponse> findAllWithBestDiscount() {
+        return carService.findAllWithBestDiscount();
+    }
+
+    // Role: ANONYMOUS
+    @GetMapping("/no-reservations")
+    public List<CarResponse> findAllByReservationsIsEmpty() {
+        return carService.findAllByReservationsIsEmpty();
+    }
 }

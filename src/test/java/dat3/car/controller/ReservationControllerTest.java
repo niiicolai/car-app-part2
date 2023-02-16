@@ -138,4 +138,27 @@ public class ReservationControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 	}
+
+	@Test
+	void findAllByMember() throws Exception {
+		String url = String.format("/api/v1/reservations/find-all-by-member/%s", 
+			reservationSamples.get(0).getMember().getUsername());
+
+        mockMvc.perform(get(url))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(1)))
+				.andExpect(jsonPath("$.[0].carBrand", is(reservationSamples.get(0).getCar().getBrand())));
+	}
+
+	@Test
+	void countByMember() throws Exception {
+		String url = String.format("/api/v1/reservations/count-by-member/%s", 
+			reservationSamples.get(0).getMember().getUsername());
+
+        mockMvc.perform(get(url))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(1)));
+	}
 }

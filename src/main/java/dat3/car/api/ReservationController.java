@@ -24,7 +24,7 @@ public class ReservationController {
         return reservationService.findAll();
     }
 
-    // Role: ADMIN
+    // Role: MEMBER
     @GetMapping("/{id}")
     public ReservationResponse find(@PathVariable("id") int id) {
         return reservationService.find(id);
@@ -46,5 +46,17 @@ public class ReservationController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") int id) {
         reservationService.delete(id);
+    }
+
+    // Role: MEMBER
+    @GetMapping("/find-all-by-member/{username}")
+    public List<ReservationResponse> findAllByMember(@PathVariable("username") String username) {
+        return reservationService.findAllByMember(username);
+    }
+
+    // Role: MEMBER
+    @GetMapping("/count-by-member/{username}")
+    public int countByMember(@PathVariable("username") String username) {
+        return reservationService.countByMember(username);
     }
 }
