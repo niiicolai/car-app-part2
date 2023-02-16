@@ -1,7 +1,7 @@
 'use strict';
 
 class Api {
-    static path = "http://localhost:8080/api/v1";
+    static path = `${window.location.protocol}//${window.location.host}/api/v1`;
 
     static async get(endpoint, callback) {
         const response = await fetch(this.path + endpoint);
