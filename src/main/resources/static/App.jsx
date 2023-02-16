@@ -1,7 +1,7 @@
 'use strict';
 
 class Api {
-    static path = "http://localhost:8080/api/v1";
+    static path = `${window.location.protocol}//${window.location.host}/api/v1`;
 
     static async get(endpoint, callback) {
         const response = await fetch(this.path + endpoint);
@@ -196,9 +196,9 @@ class CarCollection extends React.Component {
 function App() {
     return (
         <div>
-            <nav class="navbar bg-light mb-3">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1">Car Rental App</span>
+            <nav className="navbar bg-light mb-3">
+                <div className="container-fluid">
+                    <span className="navbar-brand mb-0 h1">Car Rental App</span>
                 </div>
             </nav>
 
