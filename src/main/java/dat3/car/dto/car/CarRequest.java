@@ -1,9 +1,8 @@
-package dat3.car.dto;
+package dat3.car.dto.car;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import dat3.car.entity.Car;
-import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,8 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public class CarResponse {
+public class CarRequest {
 
     @JsonProperty
     private int id;
@@ -29,19 +27,15 @@ public class CarResponse {
     @JsonProperty
     private int bestDiscount;
 
-    @JsonProperty
-    private LocalDateTime created;
-
-    @JsonProperty
-    private LocalDateTime lastEdited;
-
-    public CarResponse(Car car) {
+    public CarRequest(Car car) {
         id = car.getId();
         brand = car.getBrand();
         model = car.getModel();
         pricePrDay = car.getPricePrDay();
         bestDiscount = car.getBestDiscount();
-        created = car.getCreated();
-        lastEdited = car.getLastEdited();
+    }
+
+    public Car toCar() {
+        return new Car(brand, model, pricePrDay, bestDiscount);
     }
 }

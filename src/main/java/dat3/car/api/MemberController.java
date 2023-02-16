@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
-import dat3.car.dto.MemberRequest;
-import dat3.car.dto.MemberResponse;
+import dat3.car.dto.member.MemberRequest;
+import dat3.car.dto.member.MemberResponse;
 import dat3.car.service.MemberService;
 
 @RestController
