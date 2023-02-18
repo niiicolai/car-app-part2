@@ -12,18 +12,21 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import dat3.car.config.SampleTestConfig;
-import dat3.car.dto.member.MemberRequest;
-import dat3.car.dto.member.MemberResponse;
-import dat3.car.entity.Member;
-import dat3.car.repository.MemberRepository;
+import dat3.car.config.SecurityTestConfig;
+import dat3.car.member.dto.MemberRequest;
+import dat3.car.member.dto.MemberResponse;
+import dat3.car.member.entity.Member;
+import dat3.car.member.repository.MemberRepository;
+import dat3.car.member.service.MemberService;
 
 @DataJpaTest
 @TestInstance(Lifecycle.PER_CLASS)
-@Import(SampleTestConfig.class)
+@Import({SampleTestConfig.class, SecurityTestConfig.class})
 public class MemberServiceTest {
 
     @Autowired 
@@ -35,11 +38,14 @@ public class MemberServiceTest {
     @Autowired 
     List<MemberRequest> memberRequestSamples;
 
+    @Autowired
+	PasswordEncoder passwordEncoder;
+
     MemberService memberService;
 
     @BeforeAll
     void beforeAll() {
-        memberService = new MemberService(memberRepository);
+        memberService = new MemberService(memberRepository, passwordEncoder);
 
         memberRepository.save(memberSamples.get(0));
         memberRepository.save(memberSamples.get(1));
@@ -89,4 +95,11 @@ public class MemberServiceTest {
 			memberService.find(memberSamples.get(0).getUsername());
 		});
     }
+
+    @Test
+	void testFindAllByReservationsIsNotEmpty() {
+        List<MemberResponse> responses = memberService.findAllByReservationsIsNotEmpty();
+        
+        assertEquals(0, responses.size());
+	}
 }
