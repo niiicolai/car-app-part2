@@ -4,8 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,15 +16,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import dat3.car.car.entity.Car;
+import dat3.car.car.repository.CarRepository;
 import dat3.car.config.SampleTestConfig;
-import dat3.car.dto.reservation.ReservationRequest;
-import dat3.car.dto.reservation.ReservationResponse;
-import dat3.car.entity.Reservation;
-import dat3.car.entity.Member;
-import dat3.car.entity.Car;
-import dat3.car.repository.ReservationRepository;
-import dat3.car.repository.MemberRepository;
-import dat3.car.repository.CarRepository;
+import dat3.car.member.entity.Member;
+import dat3.car.member.repository.MemberRepository;
+import dat3.car.reservation.dto.ReservationRequest;
+import dat3.car.reservation.dto.ReservationResponse;
+import dat3.car.reservation.entity.Reservation;
+import dat3.car.reservation.repository.ReservationRepository;
+import dat3.car.reservation.service.ReservationService;
 
 @DataJpaTest
 @TestInstance(Lifecycle.PER_CLASS)
@@ -96,14 +96,13 @@ public class ReservationServiceTest {
 
     @Test
     void testUpdate() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
-        LocalDateTime dateTime = LocalDateTime.parse("2012-12-12 10:10:10.1", formatter);
+        LocalDate dateTime = LocalDate.parse("2012-12-12");
         reservationRequestSamples.get(0).setId(reservationSamples.get(0).getId());
 		reservationRequestSamples.get(0).setRentalDate(dateTime);
         reservationService.update(reservationRequestSamples.get(0));
 
         ReservationResponse response = reservationService.find(reservationSamples.get(0).getId());
-        assertEquals(reservationRequestSamples.get(0).getRentalDate(), response.getRentalDate());
+        assertEquals("2012-12-12T00:00", response.getRentalDate().toString());
     }
 
     @Test

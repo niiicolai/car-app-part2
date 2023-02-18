@@ -1,7 +1,6 @@
 package dat3.car.controller;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
@@ -23,17 +22,17 @@ import org.springframework.context.annotation.Import;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import dat3.car.api.ReservationController;
+import dat3.car.car.entity.Car;
+import dat3.car.car.repository.CarRepository;
 import dat3.car.config.ObjectMapperConfig;
 import dat3.car.config.SampleTestConfig;
-import dat3.car.dto.reservation.ReservationRequest;
-import dat3.car.entity.Reservation;
-import dat3.car.entity.Member;
-import dat3.car.entity.Car;
-import dat3.car.repository.CarRepository;
-import dat3.car.repository.MemberRepository;
-import dat3.car.repository.ReservationRepository;
-import dat3.car.service.ReservationService;
+import dat3.car.member.entity.Member;
+import dat3.car.member.repository.MemberRepository;
+import dat3.car.reservation.api.ReservationController;
+import dat3.car.reservation.dto.ReservationRequest;
+import dat3.car.reservation.entity.Reservation;
+import dat3.car.reservation.repository.ReservationRepository;
+import dat3.car.reservation.service.ReservationService;
 
 @DataJpaTest
 @TestInstance(Lifecycle.PER_CLASS)
@@ -117,8 +116,7 @@ public class ReservationControllerTest {
 
 	@Test
 	void testUpdate() throws Exception {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
-        LocalDateTime dateTime = LocalDateTime.parse("2012-12-12 10:10:10.1", formatter);
+        LocalDate dateTime = LocalDate.parse("2012-12-12");
 		reservationRequestSamples.get(0).setRentalDate(dateTime);
 		reservationRequestSamples.get(0).setId(reservationSamples.get(0).getId());
 
@@ -128,7 +126,7 @@ public class ReservationControllerTest {
 					.characterEncoding("utf-8"))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.rentalDate", is(reservationRequestSamples.get(0).getRentalDate().format(formatter))))
+				.andExpect(jsonPath("$.rentalDate", is("2012-12-12")))
 				.andExpect(jsonPath("$.id", is(reservationRequestSamples.get(0).getId())));
 	}
 

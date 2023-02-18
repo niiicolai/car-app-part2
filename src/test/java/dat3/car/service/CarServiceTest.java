@@ -3,11 +3,13 @@ package dat3.car.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import dat3.car.car.dto.CarRequest;
+import dat3.car.car.dto.CarResponse;
+import dat3.car.car.entity.Car;
+import dat3.car.car.repository.CarRepository;
+import dat3.car.car.service.CarService;
 import dat3.car.config.SampleTestConfig;
-import dat3.car.dto.car.CarRequest;
-import dat3.car.dto.car.CarResponse;
-import dat3.car.entity.Car;
-import dat3.car.repository.CarRepository;
+
 import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;

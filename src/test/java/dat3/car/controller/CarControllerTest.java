@@ -24,11 +24,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dat3.car.config.ObjectMapperConfig;
 import dat3.car.config.SampleTestConfig;
-import dat3.car.dto.car.CarRequest;
-import dat3.car.api.CarController;
-import dat3.car.entity.Car;
-import dat3.car.repository.CarRepository;
-import dat3.car.service.CarService;
+import dat3.car.car.api.CarController;
+import dat3.car.car.dto.CarRequest;
+import dat3.car.car.entity.Car;
+import dat3.car.car.repository.CarRepository;
+import dat3.car.car.service.CarService;
 
 @DataJpaTest
 @TestInstance(Lifecycle.PER_CLASS)

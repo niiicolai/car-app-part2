@@ -15,6 +15,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.context.annotation.Import;
@@ -23,15 +24,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dat3.car.config.ObjectMapperConfig;
 import dat3.car.config.SampleTestConfig;
-import dat3.car.dto.member.MemberRequest;
-import dat3.car.api.MemberController;
-import dat3.car.entity.Member;
-import dat3.car.repository.MemberRepository;
-import dat3.car.service.MemberService;
+import dat3.car.config.SecurityTestConfig;
+import dat3.car.member.api.MemberController;
+import dat3.car.member.dto.MemberRequest;
+import dat3.car.member.entity.Member;
+import dat3.car.member.repository.MemberRepository;
+import dat3.car.member.service.MemberService;
 
 @DataJpaTest
 @TestInstance(Lifecycle.PER_CLASS)
-@Import({SampleTestConfig.class, ObjectMapperConfig.class})
+@Import({SampleTestConfig.class, ObjectMapperConfig.class, SecurityTestConfig.class})
 public class MemberControllerTest {
     
     @Autowired
@@ -46,11 +48,14 @@ public class MemberControllerTest {
 	@Autowired 
 	ObjectMapper objectMapper;
 
+	@Autowired
+	PasswordEncoder passwordEncoder;
+
     MockMvc mockMvc;
 
 	@BeforeAll
 	void beforeAll() {
-		MemberService memberService = new MemberService(memberRepository);
+		MemberService memberService = new MemberService(memberRepository, passwordEncoder);
         MemberController memberController = new MemberController(memberService);
         mockMvc = MockMvcBuilders.standaloneSetup(memberController).build();
 

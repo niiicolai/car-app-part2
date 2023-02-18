@@ -13,10 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import dat3.car.car.entity.Car;
+import dat3.car.car.repository.CarRepository;
 import dat3.car.config.SampleTestConfig;
-import dat3.car.entity.Car;
-import dat3.car.entity.Member;
-import dat3.car.entity.Reservation;
+import dat3.car.member.entity.Member;
+import dat3.car.member.repository.MemberRepository;
+import dat3.car.reservation.entity.Reservation;
+import dat3.car.reservation.repository.ReservationRepository;
 
 @DataJpaTest
 @TestInstance(Lifecycle.PER_CLASS)
