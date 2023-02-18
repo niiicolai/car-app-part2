@@ -4,17 +4,18 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-
 import dat3.car.security.service.MemberDetailsService;
-
+import java.util.Collections;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,91 +37,106 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private MemberDetailsService memberDetailsService;
+  @Autowired
+  private MemberDetailsService memberDetailsService;
 
-    private static final String[] unauthorizedPaths = {
-        "/",
-        "/api/v1/authenticate",
-        "/error",
-    };
+  private static final String[] unauthorizedPaths = {
+    "/",
+    "/api/v1/authenticate",
+    "/error",
+  };
 
-    private static final String[] memberPaths = {
-        "/api/v1/cars",
-        "/api/v1/members",
-        "/api/v1/reservations",
-    };
+  private static final String[] memberPaths = {
+    "/api/v1/cars",
+    "/api/v1/members",
+    "/api/v1/reservations",
+  };
 
-    private static final String[] adminPaths = {
-        "/api/v1/cars**",
-        "/api/v1/members**",
-        "/api/v1/reservations**",
-    };
+  private static final String[] adminPaths = {
+    "/api/v1/cars**",
+    "/api/v1/members**",
+    "/api/v1/reservations**",
+  };
 
-    @Value("${app.secret-key}")
-    private String tokenSecret;
+  @Value("${app.secret-key}")
+  private String tokenSecret;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
+  /*
     @Bean
         public WebSecurityCustomizer webSecurityCustomizer() {
             return (web) -> web.ignoring()
             // Spring Security should completely ignore URLs starting with /resources/
                     .requestMatchers("/**", "/api/v1/authenticate");
-        }
+        } */
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-        .authorizeHttpRequests((authorize) -> authorize
-            .requestMatchers(unauthorizedPaths).permitAll()
-            .requestMatchers(memberPaths).hasRole("MEMBER")
-            .requestMatchers(adminPaths).hasRole("ADMIN")
-        )
-        .oauth2ResourceServer()
-        .jwt()
-        .jwtAuthenticationConverter(authenticationConverter());
-;
-        return http.build();
-    }
+  @Bean
+  public SecurityFilterChain restFilterChain(HttpSecurity http) throws Exception {
+    http
+      .csrf().disable()
+      
+      .authorizeHttpRequests(authorize ->
+        authorize.requestMatchers(unauthorizedPaths).permitAll()
+      )
+      .oauth2ResourceServer()
+      .jwt()
+      .jwtAuthenticationConverter(authenticationConverter());
+    return http.build();
+  }
 
-    @Bean
-    public JwtAuthenticationConverter authenticationConverter() {
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+  @Bean
+  public JwtAuthenticationConverter authenticationConverter() {
+    JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+    jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+    jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
-    }
+    JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+    jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
+      jwtGrantedAuthoritiesConverter
+    );
+    return jwtAuthenticationConverter;
+  }
 
-    @Bean
-    public JwtEncoder jwtEncoder() throws JOSEException {
-        SecretKey key = new SecretKeySpec(tokenSecret.getBytes(), "HmacSHA256");
-        JWKSource<SecurityContext> immutableSecret = new ImmutableSecret<SecurityContext>(key);
-        return new NimbusJwtEncoder(immutableSecret);
-    }
+  public void configureGlobal(AuthenticationManagerBuilder auth)
+    throws Exception {
+    auth
+      .userDetailsService(memberDetailsService)
+      .passwordEncoder(passwordEncoder());
+  }
 
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        SecretKey originalKey = new SecretKeySpec(tokenSecret.getBytes(),"HmacSHA256");
-        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
-            .withSecretKey(originalKey)
-            .build();
-        return jwtDecoder;
-    }
+  @Bean
+  public AuthenticationManager authenticationManager() throws Exception {
+    return new ProviderManager(
+      Collections.singletonList(authenticationProvider())
+    );
+  }
 
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(memberDetailsService).passwordEncoder(passwordEncoder());
-    }
+  @Bean
+  public DaoAuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+    authenticationProvider.setUserDetailsService(memberDetailsService);
+    authenticationProvider.setPasswordEncoder(passwordEncoder());
+    return authenticationProvider;
+  }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) 
-            throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public SecretKey secretKey() {
+    return new SecretKeySpec(tokenSecret.getBytes(), "HmacSHA256");
+  }
+
+  @Bean
+  public JwtDecoder jwtDecoder() {
+    return NimbusJwtDecoder.withSecretKey(secretKey()).build();
+  }
+
+  @Bean
+  public JwtEncoder jwtEncoder() {
+    return new NimbusJwtEncoder(
+      new ImmutableSecret<SecurityContext>(secretKey())
+    );
+  }
 }
