@@ -38,16 +38,13 @@ public class CarRepositoryTest {
 
     @BeforeAll
 	void beforeAll() {
-        int i = 0;
         for (Reservation sample : reservationSamples) {
             carRepository.save(sample.getCar());
 			memberRepository.save(sample.getMember());
-            Reservation saved = reservationRepository.save(sample);
-            reservationSamples.set(i, saved);
-            i++;
         }
 
-        reservationRepository.deleteById(reservationSamples.get(reservationSamples.size() - 1).getId());
+        reservationSamples.get(0).setId(reservationRepository.save(reservationSamples.get(0)).getId());
+        reservationSamples.get(1).setId(reservationRepository.save(reservationSamples.get(1)).getId());
 	}
 
 	@AfterAll
