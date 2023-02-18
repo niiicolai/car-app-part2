@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Import;
 import dat3.car.car.entity.Car;
 import dat3.car.car.repository.CarRepository;
 import dat3.car.config.SampleTestConfig;
+import dat3.car.member.entity.Member;
 import dat3.car.member.repository.MemberRepository;
 import dat3.car.reservation.entity.Reservation;
 import dat3.car.reservation.repository.ReservationRepository;
@@ -39,8 +40,11 @@ public class CarRepositoryTest {
     @BeforeAll
 	void beforeAll() {
         for (Reservation sample : reservationSamples) {
-            carRepository.save(sample.getCar());
-			memberRepository.save(sample.getMember());
+            Car car = carRepository.save(sample.getCar());
+			Member member = memberRepository.save(sample.getMember());
+
+            sample.setCar(car);
+			sample.setMember(member);
         }
 
         reservationSamples.get(0).setId(reservationRepository.save(reservationSamples.get(0)).getId());
