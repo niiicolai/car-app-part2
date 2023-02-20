@@ -2,13 +2,12 @@ package dat3.car.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -22,7 +21,6 @@ import dat3.car.reservation.entity.Reservation;
 import dat3.car.reservation.repository.ReservationRepository;
 
 @DataJpaTest
-@TestInstance(Lifecycle.PER_CLASS)
 @Import(SampleTestConfig.class)
 public class MemberRepositoryTest {
     @Autowired
@@ -35,23 +33,21 @@ public class MemberRepositoryTest {
 	CarRepository carRepository;
 
     @Autowired 
-    List<Reservation> reservationSamples;
+    List<Car> carSamples;
 
-    @BeforeAll
-	void beforeAll() {
-        for (int i = 0; i < reservationSamples.size(); i++) {
-			Car car = carRepository.save(reservationSamples.get(i).getCar());
-			Member member = memberRepository.save(reservationSamples.get(i).getMember());
-			
-			reservationSamples.get(i).setCar(car);
-			reservationSamples.get(i).setMember(member);
-		}
+    @Autowired 
+    List<Member> memberSamples;
 
-        reservationSamples.get(0).setId(reservationRepository.save(reservationSamples.get(0)).getId());
+    @BeforeEach
+	void beforeEach() {
+        carSamples = carRepository.saveAll(carSamples);
+        memberSamples = memberRepository.saveAll(memberSamples);
+
+        reservationRepository.save(new Reservation(memberSamples.get(0), carSamples.get(0), LocalDateTime.now()));
 	}
 
-	@AfterAll
-    void afterAll() {
+	@AfterEach
+    void afterEach() {
         reservationRepository.deleteAll();
         memberRepository.deleteAll();
         carRepository.deleteAll();
@@ -62,6 +58,5 @@ public class MemberRepositoryTest {
 		List<Member> members = memberRepository.findAllByReservationsIsNotEmpty();
 
 		assertEquals(1, members.size());
-        assertEquals(true, members.size() < reservationSamples.size());
 	}
 }

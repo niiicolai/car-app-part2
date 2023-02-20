@@ -1,4 +1,3 @@
-'use strict';
 
 class Api {
     static host = window.location.host;
@@ -13,47 +12,72 @@ class Api {
     }
 
     static headers() {
+        const authorization = Api.authorizationToken != "" ? `Bearer ${Api.authorizationToken}` : "";
         return {
             'Content-Type': Api.contentType,
-            'Authorization': Api.authorizationToken
+            'Authorization': authorization
         };
     }
 
-    static async get(endpoint, callback) {
+    static async get(endpoint, callback, errorCallback) {
         const uri = `${this.fullpath()}${endpoint}`;
         const response = await fetch(uri, {
             method: 'GET',
             headers: this.headers()
         });
-        callback(await response.json());
+
+        if (!response.ok) {
+            errorCallback(await response.json())
+        } else {
+            callback(await response.json());
+            errorCallback({});
+        }
     };
 
-    static async post(endpoint, data, callback) {
+    static async post(endpoint, data, callback, errorCallback) {
         const uri = `${this.fullpath()}${endpoint}`;
         const response = await fetch(uri, {
             method: 'POST',
             headers: this.headers(),
             body: JSON.stringify(data)
         });
-        callback(await response.json());
+
+        if (!response.ok) {
+            errorCallback(await response.json())
+        } else {
+            callback(await response.json());
+            errorCallback({});
+        }
     };
 
-    static async patch(endpoint, data, callback) {
+    static async patch(endpoint, data, callback, errorCallback) {
         const uri = `${this.fullpath()}${endpoint}`;
         const response = await fetch(uri, {
             method: 'PATCH',
             headers: this.headers(),
             body: JSON.stringify(data)
         });
-        callback(await response.json());
+
+        if (!response.ok) {
+            errorCallback(await response.json())
+        } else {
+            callback(await response.json());
+            errorCallback({});
+        }
     };
 
-    static async delete(endpoint, callback) {
+    static async delete(endpoint, callback, errorCallback) {
         const uri = `${this.fullpath()}${endpoint}`;
         const response = await fetch(uri, {
             method: 'DELETE',
             headers: this.headers()
         });
-        callback(await response.json());
+
+        if (!response.ok) {
+            errorCallback(await response.json())
+        } else {
+            callback(await response.json());
+            errorCallback({});
+        }
     };
 }

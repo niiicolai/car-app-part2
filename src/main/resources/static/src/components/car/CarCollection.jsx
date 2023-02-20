@@ -6,7 +6,6 @@ function CarCollection(props) {
             {props.cars.map((car, index) =>
                 <CarView key={index} 
                     car={car} 
-                    members={props.members} 
                     prefix={props.prefix} 
                     username={props.username} 
                     refresh={props.refresh} />

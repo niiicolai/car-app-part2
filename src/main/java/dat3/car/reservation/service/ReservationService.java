@@ -1,5 +1,6 @@
 package dat3.car.reservation.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,10 +57,16 @@ public class ReservationService {
         if (memberOpt.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member with <USERNAME> doesn't exist!");
 
-        Reservation reservation = new Reservation(memberOpt.get(), carOpt.get(), 
-            reservationRequest.getRentalDate().atStartOfDay());
-        
+        LocalDateTime rentalDate = reservationRequest.getRentalDate().atStartOfDay();
+        if (rentalDate.isBefore(LocalDateTime.now()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The rental date cannot be in the past!");
+
+        if (reservationRepository.existsByCarAndRentalDate(carOpt.get(), rentalDate))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car already has a reservation at the given date!");
+
+        Reservation reservation = new Reservation(memberOpt.get(), carOpt.get(), rentalDate);
         reservation = reservationRepository.save(reservation);
+        
         return new ReservationResponse(reservation);
     }
 
@@ -67,6 +74,14 @@ public class ReservationService {
         Optional<Reservation> reservationOpt = reservationRepository.findById(reservationRequest.getId());
         if (reservationOpt.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation with <ID> doesn't exist!");
+
+        LocalDateTime rentalDate = reservationRequest.getRentalDate().atStartOfDay();
+        if (rentalDate.isBefore(LocalDateTime.now()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The rental date cannot be in the past!");
+    
+        Car car = reservationOpt.get().getCar();
+        if (reservationRepository.existsByCarAndRentalDate(car, rentalDate))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car already has a reservation at the given date!");
 
         Reservation reservation = reservationOpt.get();
         reservation.setRentalDate(reservationRequest.getRentalDate().atStartOfDay());

@@ -7,10 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +29,6 @@ import dat3.car.car.repository.CarRepository;
 import dat3.car.car.service.CarService;
 
 @DataJpaTest
-@TestInstance(Lifecycle.PER_CLASS)
 @Import({SampleTestConfig.class, ObjectMapperConfig.class})
 public class CarControllerTest {    
 
@@ -49,8 +46,8 @@ public class CarControllerTest {
 
     MockMvc mockMvc;
 
-	@BeforeAll
-	void beforeAll() {
+	@BeforeEach
+	void beforeEach() {
 		CarService carService = new CarService(carRepository);
         CarController carController = new CarController(carService);
         mockMvc = MockMvcBuilders.standaloneSetup(carController).build();
@@ -62,8 +59,8 @@ public class CarControllerTest {
         carSamples.get(1).setId(carRepository.save(carSamples.get(1)).getId());
 	}
 
-    @AfterAll
-    void afterAll() {
+    @AfterEach
+    void afterEach() {
         carRepository.deleteAll();
     }
     

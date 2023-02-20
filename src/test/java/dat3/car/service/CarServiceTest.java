@@ -9,48 +9,68 @@ import dat3.car.car.entity.Car;
 import dat3.car.car.repository.CarRepository;
 import dat3.car.car.service.CarService;
 import dat3.car.config.SampleTestConfig;
+import dat3.car.member.entity.Member;
+import dat3.car.member.repository.MemberRepository;
+import dat3.car.reservation.entity.Reservation;
+import dat3.car.reservation.repository.ReservationRepository;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
-@TestInstance(Lifecycle.PER_CLASS)
 @Import(SampleTestConfig.class)
 public class CarServiceTest {
 
 	@Autowired
 	CarRepository carRepository;	
 
+	@Autowired
+	MemberRepository memberRepository;
+
+	@Autowired
+	ReservationRepository reservationRepository;
+
 	@Autowired 
     List<Car> carSamples;
-	
-	@Autowired 
-	List<CarRequest> carRequestSamples;
 
+	@Autowired 
+    List<Member> memberSamples;
+	
+	List<CarRequest> carRequestSamples;
 	CarService carService;
 
-	@BeforeAll
-	void beforeAll() {
+    List<Reservation> reservationSamples;
+
+	@BeforeEach
+	void beforeEach() {
 		carService = new CarService(carRepository);
 
-		// Ensure number two sample has the highest discount
-		carSamples.get(1).setBestDiscount(99999999);
+		carSamples.get(carSamples.size() - 1).setBestDiscount(999999);
+        carSamples = carRepository.saveAll(carSamples);
+		carRequestSamples = carSamples.stream().map(r -> new CarRequest(r)).collect(Collectors.toList());
+        memberSamples = memberRepository.saveAll(memberSamples);
 
-		carSamples.get(0).setId(carRepository.save(carSamples.get(0)).getId());
-		carSamples.get(1).setId(carRepository.save(carSamples.get(1)).getId());
+        reservationSamples = new ArrayList<Reservation>(Arrays.asList(
+            reservationRepository.save(new Reservation(memberSamples.get(0), carSamples.get(0), LocalDateTime.now())),
+            reservationRepository.save(new Reservation(memberSamples.get(1), carSamples.get(1), LocalDateTime.now()))
+        ));
 	}
 
-	@AfterAll
-    void afterAll() {
+	@AfterEach
+    void afterEach() {
+        reservationRepository.deleteAll();
+        memberRepository.deleteAll();
         carRepository.deleteAll();
     }
 
@@ -58,7 +78,7 @@ public class CarServiceTest {
 	void testFindAll() {
 		List<CarResponse> responses = carService.findAll();
 
-		assertEquals(2, responses.size());
+		assertEquals(carSamples.size(), responses.size());
 	}
 
 	@Test
@@ -111,9 +131,10 @@ public class CarServiceTest {
 	@Test
 	void testFindAveragePricePrDay() {
 		double expectedAverage = 0;
-        expectedAverage += carSamples.get(0).getPricePrDay();
-		expectedAverage += carSamples.get(1).getPricePrDay();
-        expectedAverage /= 2;
+		for(Car sample : carSamples) {
+			expectedAverage += sample.getPricePrDay();
+		}
+        expectedAverage /= carSamples.size();
 		double average = carRepository.findAveragePricePrDay();
 
 		assertEquals(expectedAverage, average);
@@ -124,14 +145,13 @@ public class CarServiceTest {
 		List<CarResponse> responses = carService.findAllWithBestDiscount();
 
 		assertEquals(1, responses.size());
-		assertEquals(carSamples.get(1).getId(), responses.get(0).getId());
+		assertEquals(carSamples.get(carSamples.size() - 1).getId(), responses.get(0).getId());
 	}
 
 	@Test
 	void testFindAllByReservationsIsEmpty() {
-		// Ideal: Add an reservation to one of the cars.
 		List<CarResponse> responses = carService.findAllByReservationsIsEmpty();
 
-		assertEquals(2, responses.size());
+		assertEquals(carSamples.size() - 2, responses.size());
 	}
 }

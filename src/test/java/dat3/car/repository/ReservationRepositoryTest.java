@@ -1,15 +1,18 @@
 package dat3.car.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -23,7 +26,6 @@ import dat3.car.reservation.entity.Reservation;
 import dat3.car.reservation.repository.ReservationRepository;
 
 @DataJpaTest
-@TestInstance(Lifecycle.PER_CLASS)
 @Import(SampleTestConfig.class)
 public class ReservationRepositoryTest {
 
@@ -37,38 +39,41 @@ public class ReservationRepositoryTest {
 	CarRepository carRepository;
 
     @Autowired 
+    List<Car> carSamples;
+
+    @Autowired 
+    List<Member> memberSamples;
+
     List<Reservation> reservationSamples;
 
-    @BeforeAll
-	void beforeAll() {
-        for (int i = 0; i < reservationSamples.size(); i++) {
-			Car car = carRepository.save(reservationSamples.get(i).getCar());
-			Member member = memberRepository.save(reservationSamples.get(i).getMember());
-			
-			reservationSamples.get(i).setCar(car);
-			reservationSamples.get(i).setMember(member);
-		}
+    @BeforeEach
+	void beforeEach() {
+        carSamples = carRepository.saveAll(carSamples);
+        memberSamples = memberRepository.saveAll(memberSamples);
 
-        reservationSamples.get(0).setId(reservationRepository.save(reservationSamples.get(0)).getId());
+        reservationSamples = new ArrayList<Reservation>(Arrays.asList(
+            reservationRepository.save(new Reservation(memberSamples.get(0), carSamples.get(0), LocalDate.now().atStartOfDay()))
+        ));
 	}
 
-	@AfterAll
-    void afterAll() {
+	@AfterEach
+    void afterEach() {
         reservationRepository.deleteAll();
         memberRepository.deleteAll();
         carRepository.deleteAll();
     }
 
 	@Test
+    @Order(1)
 	void testFindAllByMember() {
         // Member with reservation
-        Optional<Member> memberWithReservation = memberRepository.findById(reservationSamples.get(0).getMember().getUsername());
+        Optional<Member> memberWithReservation = memberRepository.findById(memberSamples.get(0).getUsername());
 		List<Reservation> reservations1 = reservationRepository.findAllByMember(memberWithReservation.get());
 
         // Member without reservation
-        Optional<Member> memberWithoutReservation = memberRepository.findById(reservationSamples.get(1).getMember().getUsername());
+        Optional<Member> memberWithoutReservation = memberRepository.findById(memberSamples.get(1).getUsername());
 		List<Reservation> reservations2 = reservationRepository.findAllByMember(memberWithoutReservation.get());
-
+        
 		assertEquals(1, reservations1.size());
         assertEquals(reservationSamples.get(0).getId(), reservations1.get(0).getId());
 
@@ -76,16 +81,32 @@ public class ReservationRepositoryTest {
 	}
 
     @Test
+    @Order(2)
 	void testCountByMember() {
         // Member with reservation
-        Optional<Member> memberWithReservation = memberRepository.findById(reservationSamples.get(0).getMember().getUsername());
+        Optional<Member> memberWithReservation = memberRepository.findById(memberSamples.get(0).getUsername());
 		int count1 = reservationRepository.countByMember(memberWithReservation.get());
 
         // Member without reservation
-        Optional<Member> memberWithoutReservation = memberRepository.findById(reservationSamples.get(1).getMember().getUsername());
+        Optional<Member> memberWithoutReservation = memberRepository.findById(memberSamples.get(1).getUsername());
 		int count2 = reservationRepository.countByMember(memberWithoutReservation.get());
 
 		assertEquals(1, count1);
         assertEquals(0, count2);
+	}
+
+    @Test
+    @Order(3)
+	void testExistByCarAndRentalDate() {
+        Optional<Car> carOpt = carRepository.findById(carSamples.get(0).getId());
+
+        boolean shouldExist = reservationRepository.existsByCarAndRentalDate(
+            carOpt.get(), reservationSamples.get(0).getRentalDate());
+        
+        boolean shouldNotExist = reservationRepository.existsByCarAndRentalDate(
+            carOpt.get(), reservationSamples.get(0).getRentalDate().plusDays(1));
+
+        assertTrue(shouldExist);
+        assertTrue(!(shouldNotExist));
 	}
 }
