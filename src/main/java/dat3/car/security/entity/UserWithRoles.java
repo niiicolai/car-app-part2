@@ -53,9 +53,11 @@ public class UserWithRoles implements UserDetails {
     @UpdateTimestamp
     private LocalDateTime lastEdited;
 
+    private static final String ROLE_PREFIX = "ROLE_%s";
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role)).collect(Collectors.toList());
+        return roles.stream().map(role -> new SimpleGrantedAuthority(String.format(ROLE_PREFIX, role))).collect(Collectors.toList());
     }
 
     @Override

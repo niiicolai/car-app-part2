@@ -47,7 +47,11 @@ class CarReservationForm extends React.Component {
             this.setState({ reservation: json });
             this.props.carView.setState({ reservation: json });
             this.props.refresh();
-        });
+        }, this.errorHandling.bind(this));
+    }
+
+    errorHandling(error) {
+        this.setState({ responseType: 'danger', responseMsg: error.message });
     }
 
     render() {

@@ -3,19 +3,23 @@ package dat3.car.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import dat3.car.car.entity.Car;
+import dat3.car.car.repository.CarRepository;
 import dat3.car.config.SampleTestConfig;
 import dat3.car.config.SecurityTestConfig;
 import dat3.car.member.dto.MemberRequest;
@@ -23,44 +27,63 @@ import dat3.car.member.dto.MemberResponse;
 import dat3.car.member.entity.Member;
 import dat3.car.member.repository.MemberRepository;
 import dat3.car.member.service.MemberService;
+import dat3.car.reservation.entity.Reservation;
+import dat3.car.reservation.repository.ReservationRepository;
 
 @DataJpaTest
-@TestInstance(Lifecycle.PER_CLASS)
 @Import({SampleTestConfig.class, SecurityTestConfig.class})
 public class MemberServiceTest {
-
-    @Autowired 
-    MemberRepository memberRepository;
-
-    @Autowired 
-    List<Member> memberSamples;
-    
-    @Autowired 
-    List<MemberRequest> memberRequestSamples;
 
     @Autowired
 	PasswordEncoder passwordEncoder;
 
+    @Autowired
+	CarRepository carRepository;
+
+    @Autowired 
+    MemberRepository memberRepository;
+
+    @Autowired
+	ReservationRepository reservationRepository;
+
+    @Autowired 
+    List<Car> carSamples;
+
+    @Autowired 
+    List<Member> memberSamples;
+    
+    List<MemberRequest> memberRequestSamples;
+
     MemberService memberService;
 
-    @BeforeAll
-    void beforeAll() {
+    List<Reservation> reservationSamples;
+
+    @BeforeEach
+    void beforeEach() {
         memberService = new MemberService(memberRepository, passwordEncoder);
 
-        memberRepository.save(memberSamples.get(0));
-        memberRepository.save(memberSamples.get(1));
+        carSamples = carRepository.saveAll(carSamples);
+        memberSamples = memberRepository.saveAll(memberSamples);
+		memberRequestSamples = memberSamples.stream().map(r -> new MemberRequest(r)).collect(Collectors.toList());
+
+        reservationSamples = new ArrayList<Reservation>(Arrays.asList(
+            reservationRepository.save(new Reservation(memberSamples.get(0), carSamples.get(0), LocalDateTime.now())),
+            reservationRepository.save(new Reservation(memberSamples.get(1), carSamples.get(1), LocalDateTime.now()))
+        ));
     }
 
-    @AfterAll
-    void afterAll() {
+    @AfterEach
+    void afterEach() {
+        reservationRepository.deleteAll();
         memberRepository.deleteAll();
+        carRepository.deleteAll();
     }
     
     @Test
     void testFindAll() {
         List<MemberResponse> responses = memberService.findAll();
         
-        assertEquals(2, responses.size());
+        assertEquals(memberSamples.size(), responses.size());
     }
 
     @Test
@@ -72,6 +95,7 @@ public class MemberServiceTest {
 
     @Test
     void testCreate() {
+        memberRepository.delete(memberSamples.get(2));
         memberService.create(memberRequestSamples.get(2));
 
         MemberResponse response = memberService.find(memberSamples.get(2).getUsername());
@@ -100,6 +124,6 @@ public class MemberServiceTest {
 	void testFindAllByReservationsIsNotEmpty() {
         List<MemberResponse> responses = memberService.findAllByReservationsIsNotEmpty();
         
-        assertEquals(0, responses.size());
+        assertEquals(reservationSamples.size(), responses.size());
 	}
 }

@@ -7,11 +7,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.http.MediaType;
@@ -32,7 +30,6 @@ import dat3.car.member.repository.MemberRepository;
 import dat3.car.member.service.MemberService;
 
 @DataJpaTest
-@TestInstance(Lifecycle.PER_CLASS)
 @Import({SampleTestConfig.class, ObjectMapperConfig.class, SecurityTestConfig.class})
 public class MemberControllerTest {
     
@@ -53,8 +50,8 @@ public class MemberControllerTest {
 
     MockMvc mockMvc;
 
-	@BeforeAll
-	void beforeAll() {
+	@BeforeEach
+	void beforeEach() {
 		MemberService memberService = new MemberService(memberRepository, passwordEncoder);
         MemberController memberController = new MemberController(memberService);
         mockMvc = MockMvcBuilders.standaloneSetup(memberController).build();
@@ -63,8 +60,8 @@ public class MemberControllerTest {
         memberRepository.save(memberSamples.get(1));
 	}
 
-    @AfterAll
-    void afterAll() {
+    @AfterEach
+    void afterEach() {
         memberRepository.deleteAll();
     }
     

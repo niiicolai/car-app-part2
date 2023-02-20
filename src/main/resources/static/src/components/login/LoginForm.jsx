@@ -8,7 +8,7 @@ class LoginForm extends React.Component {
             responseType: null,
             responseMsg: null,
             username: "user1",
-            password: "pass1"
+            password: "pass"
         };
     }
 
@@ -53,50 +53,57 @@ class LoginForm extends React.Component {
             this.setState({ authenticatedUser: json });
             this.props.parentView.setState({ authenticatedUser: json });
             this.props.refresh(json);
-        });
+        }, this.errorHandling.bind(this));
+    }
+
+    errorHandling(error) {
+        this.setState({ responseType: 'danger', responseMsg: error.message });
     }
 
     render() {
         if (this.state.authenticatedUser == null) {
             return (
-                <div className="card login-container">
-                    <div className="card-body">
+                <div>
+                    {this.state.responseMsg &&
+                        <Alert type={this.state.responseType}
+                            msg={this.state.responseMsg} />
+                    }
+                    <div className="card login-container">
+                        <div className="card-body">
 
-                        <h5 className="card-title text-center mb-3">
-                            Login
-                        </h5>
+                            <h5 className="card-title text-center mb-3">
+                                Login
+                            </h5>
 
-                        <h6 className="card-subtitle mb-3 text-muted text-center">
-                            Enter your credentials to continue
-                        </h6>
+                            <h6 className="card-subtitle mb-3 text-muted text-center">
+                                Enter your credentials to continue
+                            </h6>
 
-                        {this.state.responseMsg &&
-                            <Alert type={this.state.responseType}
-                                msg={this.state.responseMsg} />
-                        }
+                            
 
-                        <div className="mb-3">
-                            <label className="form-label">Username:</label>
-                            <input type="text"
-                                value={this.state.username}
-                                onChange={this.handleUsername.bind(this)}
-                                className="form-control form-control-sm"
-                                onKeyDown={this.handleKeydown.bind(this)} />
-                        </div>
+                            <div className="mb-3">
+                                <label className="form-label">Username:</label>
+                                <input type="text"
+                                    value={this.state.username}
+                                    onChange={this.handleUsername.bind(this)}
+                                    className="form-control form-control-sm"
+                                    onKeyDown={this.handleKeydown.bind(this)} />
+                            </div>
 
-                        <div className="mb-3">
-                            <label className="form-label">Password:</label>
-                            <input type="password"
-                                value={this.state.password}
-                                onChange={this.handlePassword.bind(this)}
-                                className="form-control form-control-sm"
-                                onKeyDown={this.handleKeydown.bind(this)} />
-                        </div>
+                            <div className="mb-3">
+                                <label className="form-label">Password:</label>
+                                <input type="password"
+                                    value={this.state.password}
+                                    onChange={this.handlePassword.bind(this)}
+                                    className="form-control form-control-sm"
+                                    onKeyDown={this.handleKeydown.bind(this)} />
+                            </div>
 
-                        <div className="d-grid gap-2">
-                            <button type="button"
-                                className="btn btn-primary btn-sm"
-                                onClick={this.login.bind(this)}>Login</button>
+                            <div className="d-grid gap-2">
+                                <button type="button"
+                                    className="btn btn-primary btn-sm"
+                                    onClick={this.login.bind(this)}>Login</button>
+                            </div>
                         </div>
                     </div>
                 </div>

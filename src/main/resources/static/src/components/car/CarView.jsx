@@ -53,7 +53,6 @@ class CarView extends React.Component {
                     <CarReservationForm
                         username={this.props.username}
                         car={this.state.car}
-                        members={this.props.members}
                         carView={this}
                         prefix={this.props.prefix}
                         refresh={this.props.refresh} />

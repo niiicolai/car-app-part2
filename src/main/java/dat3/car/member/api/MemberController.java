@@ -24,11 +24,11 @@ public class MemberController {
         return memberService.findAll();
     }
 
-    // Role: USER
+    // Role: MEMBER
     @GetMapping("/{username}")
     public MemberResponse find(@PathVariable("username") String username) {
         return memberService.find(username);
-    }
+    }    
 
     // Role: ANONYMOUS
     @PostMapping
@@ -36,13 +36,13 @@ public class MemberController {
         return memberService.create(memberRequest);
     }
 
-    // Role: USER
+    // Role: MEMBER
     @PatchMapping
     public MemberResponse update(@RequestBody MemberRequest memberRequest) {
         return memberService.update(memberRequest);
     }
 
-    // Role: USER
+    // Role: ADMIN
     @DeleteMapping("/{username}")
     public void delete(@PathVariable("username") String username) {
         memberService.delete(username);

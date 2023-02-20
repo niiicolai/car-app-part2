@@ -2,13 +2,14 @@ package dat3.car.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -22,7 +23,6 @@ import dat3.car.reservation.entity.Reservation;
 import dat3.car.reservation.repository.ReservationRepository;
 
 @DataJpaTest
-@TestInstance(Lifecycle.PER_CLASS)
 @Import(SampleTestConfig.class)
 public class CarRepositoryTest {
     @Autowired
@@ -35,24 +35,27 @@ public class CarRepositoryTest {
 	CarRepository carRepository;
 
     @Autowired 
+    List<Car> carSamples;
+
+    @Autowired 
+    List<Member> memberSamples;
+
     List<Reservation> reservationSamples;
 
-    @BeforeAll
-	void beforeAll() {
-        for (Reservation sample : reservationSamples) {
-            Car car = carRepository.save(sample.getCar());
-			Member member = memberRepository.save(sample.getMember());
+    @BeforeEach
+	void beforeEach() {
+        carSamples.get(carSamples.size() - 1).setBestDiscount(999999);
+        carSamples = carRepository.saveAll(carSamples);
+        memberSamples = memberRepository.saveAll(memberSamples);
 
-            sample.setCar(car);
-			sample.setMember(member);
-        }
-
-        reservationSamples.get(0).setId(reservationRepository.save(reservationSamples.get(0)).getId());
-        reservationSamples.get(1).setId(reservationRepository.save(reservationSamples.get(1)).getId());
+        reservationSamples = new ArrayList<Reservation>(Arrays.asList(
+            reservationRepository.save(new Reservation(memberSamples.get(0), carSamples.get(0), LocalDateTime.now())),
+            reservationRepository.save(new Reservation(memberSamples.get(1), carSamples.get(1), LocalDateTime.now()))
+        ));
 	}
 
-	@AfterAll
-    void afterAll() {
+	@AfterEach
+    void afterEach() {
         reservationRepository.deleteAll();
         memberRepository.deleteAll();
         carRepository.deleteAll();
@@ -60,21 +63,20 @@ public class CarRepositoryTest {
 
 	@Test
 	void testFindCarByBrandAndModel() {
-        Car carSample = reservationSamples.get(0).getCar();
-		List<Car> cars = carRepository.findAllByBrandAndModel(carSample.getBrand(), carSample.getModel());
+		List<Car> cars = carRepository.findAllByBrandAndModel(carSamples.get(0).getBrand(), carSamples.get(0).getModel());
 
 		assertEquals(1, cars.size());
-        assertEquals(carSample.getBrand(), cars.get(0).getBrand());
-        assertEquals(carSample.getModel(), cars.get(0).getModel());
+        assertEquals(carSamples.get(0).getBrand(), cars.get(0).getBrand());
+        assertEquals(carSamples.get(0).getModel(), cars.get(0).getModel());
 	}
 
     @Test
 	void testFindAveragePricePerDay() {
         double expectedAverage = 0;
-        for (Reservation sample : reservationSamples) {
-            expectedAverage += sample.getCar().getPricePrDay();
+        for (Car sample : carSamples) {
+            expectedAverage += sample.getPricePrDay();
         }
-        expectedAverage /= reservationSamples.size();
+        expectedAverage /= carSamples.size();
 		double average = carRepository.findAveragePricePrDay();
 
 		assertEquals(expectedAverage, average);
@@ -82,7 +84,7 @@ public class CarRepositoryTest {
 
     @Test
 	void testFindAllWithBestDiscount() {
-        Car carSample = reservationSamples.get(reservationSamples.size() - 1).getCar();
+        Car carSample = carSamples.get(carSamples.size() - 1);
 		List<Car> cars = carRepository.findAllWithBestDiscount();
 
 		assertEquals(1, cars.size());
@@ -94,6 +96,6 @@ public class CarRepositoryTest {
 	void testFindAllByReservationsIsEmpty() {
 		List<Car> cars = carRepository.findAllByReservationsIsEmpty();
 
-		assertEquals(1, cars.size());
+		assertEquals(carSamples.size() - 2, cars.size());
 	}
 }

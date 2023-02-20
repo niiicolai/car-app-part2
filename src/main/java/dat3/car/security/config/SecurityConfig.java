@@ -1,9 +1,10 @@
 package dat3.car.security.config;
 
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+
+import dat3.car.security.error.CustomOAuth2AccessDeniedHandler;
+import dat3.car.security.error.CustomOAuth2AuthenticationEntryPoint;
 import dat3.car.security.service.MemberDetailsService;
 import java.util.Collections;
 import javax.crypto.SecretKey;
@@ -12,15 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.ObjectPostProcessor;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -35,108 +37,137 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-  @Autowired
-  private MemberDetailsService memberDetailsService;
+    @Autowired
+    private MemberDetailsService memberDetailsService;
 
-  private static final String[] unauthorizedPaths = {
-    "/",
-    "/api/v1/authenticate",
-    "/error",
-  };
+    @Value("${app.secret-key}")
+    private String tokenSecret;
 
-  private static final String[] memberPaths = {
-    "/api/v1/cars",
-    "/api/v1/members",
-    "/api/v1/reservations",
-  };
-
-  private static final String[] adminPaths = {
-    "/api/v1/cars**",
-    "/api/v1/members**",
-    "/api/v1/reservations**",
-  };
-
-  @Value("${app.secret-key}")
-  private String tokenSecret;
-
-  /*
     @Bean
-        public WebSecurityCustomizer webSecurityCustomizer() {
-            return (web) -> web.ignoring()
-            // Spring Security should completely ignore URLs starting with /resources/
-                    .requestMatchers("/**", "/api/v1/authenticate");
-        } */
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        //This line is added to make the h2-console work (if needed)
+        http.headers().frameOptions().disable();
+        http
+                .cors().and().csrf().disable()
 
-  @Bean
-  public SecurityFilterChain restFilterChain(HttpSecurity http) throws Exception {
-    http
-      .csrf().disable()
-      
-      .authorizeHttpRequests(authorize ->
-        authorize.requestMatchers(unauthorizedPaths).permitAll()
-      )
-      .oauth2ResourceServer()
-      .jwt()
-      .jwtAuthenticationConverter(authenticationConverter());
-    return http.build();
-  }
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                //REF: https://mflash.dev/post/2021/01/19/error-handling-for-spring-security-resource-server/
+                .exceptionHandling((exceptions) -> exceptions
+                        .authenticationEntryPoint(new CustomOAuth2AuthenticationEntryPoint())
+                        .accessDeniedHandler(new CustomOAuth2AccessDeniedHandler())
+                )
+                .oauth2ResourceServer()
+                .jwt()
+                .jwtAuthenticationConverter(authenticationConverter());
 
-  @Bean
-  public JwtAuthenticationConverter authenticationConverter() {
-    JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-    jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
-    jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+        http.authorizeHttpRequests((authorize) -> authorize
+                //Obviously we need to be able to login without being logged in :-)
+                .requestMatchers(HttpMethod.POST, "/api/v1/authenticate").permitAll()
 
-    JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-    jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
-      jwtGrantedAuthoritiesConverter
-    );
-    return jwtAuthenticationConverter;
-  }
+                //Required in order to use the h2-console
+                .requestMatchers("/h2*/**").permitAll()
 
-  public void configureGlobal(AuthenticationManagerBuilder auth)
-    throws Exception {
-    auth
-      .userDetailsService(memberDetailsService)
-      .passwordEncoder(passwordEncoder());
-  }
+                .requestMatchers("/").permitAll()
+                .requestMatchers("/index.html").permitAll() //Allow for a default index.html file
+                .requestMatchers("/favicon.ico").permitAll() //Allow for a default favicon.ico file
+                .requestMatchers("/src/**").permitAll() // permit javascript stuff
 
-  @Bean
-  public AuthenticationManager authenticationManager() throws Exception {
-    return new ProviderManager(
-      Collections.singletonList(authenticationProvider())
-    );
-  }
+                //necessary to allow for "nice" JSON Errors
+                .requestMatchers("/error").permitAll()
 
-  @Bean
-  public DaoAuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-    authenticationProvider.setUserDetailsService(memberDetailsService);
-    authenticationProvider.setPasswordEncoder(passwordEncoder());
-    return authenticationProvider;
-  }
+                .requestMatchers(HttpMethod.GET, "/api/v1/cars").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/cars/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/cars").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/cars").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/cars/**").hasRole("ADMIN")
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+                .requestMatchers(HttpMethod.GET, "/api/v1/members").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/members/**").hasAnyRole("MEMBER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/members/no-reservations").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll()
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/members").hasAnyRole("MEMBER", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/members/**").hasRole("ADMIN")
+                
 
-  @Bean
-  public SecretKey secretKey() {
-    return new SecretKeySpec(tokenSecret.getBytes(), "HmacSHA256");
-  }
+                .requestMatchers(HttpMethod.GET, "/api/v1/reservations").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/reservations/**").hasAnyRole("MEMBER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/reservations/find-all-by-member/**").hasAnyRole("MEMBER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/reservations/count-by-member/**").hasAnyRole("MEMBER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/reservations").hasAnyRole("MEMBER", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/reservations").hasAnyRole("MEMBER", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/reservations/**").hasRole("ADMIN")
+                
+                //.requestMatchers(adminPaths).hasRole("ADMIN")
 
-  @Bean
-  public JwtDecoder jwtDecoder() {
-    return NimbusJwtDecoder.withSecretKey(secretKey()).build();
-  }
+                //.requestMatchers("/", "/**").permitAll());
 
-  @Bean
-  public JwtEncoder jwtEncoder() {
-    return new NimbusJwtEncoder(
-      new ImmutableSecret<SecurityContext>(secretKey())
-    );
-  }
+            // .requestMatchers(HttpMethod.GET,"/api/demo/anonymous").permitAll());
+
+            // Demonstrates another way to add roles to an endpoint
+            // .requestMatchers(HttpMethod.GET, "/api/demo/admin").hasAuthority("ADMIN")
+        .anyRequest().authenticated());
+
+        return http.build();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter authenticationConverter() {
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
+        jwtGrantedAuthoritiesConverter
+        );
+        return jwtAuthenticationConverter;
+    }
+
+    public void configureGlobal(AuthenticationManagerBuilder auth)
+        throws Exception {
+        auth
+        .userDetailsService(memberDetailsService)
+        .passwordEncoder(passwordEncoder());
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return new ProviderManager(
+        Collections.singletonList(authenticationProvider())
+        );
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(memberDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return authenticationProvider;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecretKey secretKey() {
+        return new SecretKeySpec(tokenSecret.getBytes(), "HmacSHA256");
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withSecretKey(secretKey()).build();
+    }
+
+    @Bean
+    public JwtEncoder jwtEncoder() {
+        return new NimbusJwtEncoder(
+        new ImmutableSecret<SecurityContext>(secretKey())
+        );
+    }
 }
