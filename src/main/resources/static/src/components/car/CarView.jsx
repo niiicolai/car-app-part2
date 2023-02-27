@@ -56,6 +56,8 @@ class CarView extends React.Component {
                         carView={this}
                         prefix={this.props.prefix}
                         refresh={this.props.refresh} />
+
+                    <CarLookup car={this.state.car} />
                 </div>
             </div>
         );

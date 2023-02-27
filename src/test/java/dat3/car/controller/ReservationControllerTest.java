@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dat3.car.car.entity.Car;
 import dat3.car.car.repository.CarRepository;
-import dat3.car.config.ObjectMapperConfig;
+import dat3.car.config.ObjectMapperTestConfig;
 import dat3.car.config.SampleTestConfig;
 import dat3.car.member.entity.Member;
 import dat3.car.member.repository.MemberRepository;
@@ -37,7 +37,7 @@ import dat3.car.reservation.repository.ReservationRepository;
 import dat3.car.reservation.service.ReservationService;
 
 @DataJpaTest
-@Import({SampleTestConfig.class, ObjectMapperConfig.class})
+@Import({SampleTestConfig.class, ObjectMapperTestConfig.class})
 public class ReservationControllerTest {
     
     @Autowired
@@ -93,7 +93,7 @@ public class ReservationControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(2)))
-				.andExpect(jsonPath("$.[0].carBrand", is(reservationSamples.get(0).getCar().getBrand())));
+				.andExpect(jsonPath("$.[0].carMake", is(reservationSamples.get(0).getCar().getMake())));
 	}
 
     @Test
@@ -101,7 +101,7 @@ public class ReservationControllerTest {
         mockMvc.perform(get(String.format("/api/v1/reservations/%s", reservationSamples.get(0).getId())))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.carBrand", is(reservationSamples.get(0).getCar().getBrand())));
+				.andExpect(jsonPath("$.carMake", is(reservationSamples.get(0).getCar().getMake())));
 	}
 
 	@Test
@@ -115,7 +115,7 @@ public class ReservationControllerTest {
 					.characterEncoding("utf-8"))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.carBrand", is(carSamples.get(2).getBrand())));
+				.andExpect(jsonPath("$.carMake", is(carSamples.get(2).getMake())));
 	}
 
 	@Test
@@ -150,7 +150,7 @@ public class ReservationControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(1)))
-				.andExpect(jsonPath("$.[0].carBrand", is(reservationSamples.get(0).getCar().getBrand())));
+				.andExpect(jsonPath("$.[0].carMake", is(reservationSamples.get(0).getCar().getMake())));
 	}
 
 	@Test

@@ -11,7 +11,7 @@ import dat3.car.car.entity.Car;
 @Repository
 public interface CarRepository extends JpaRepository<Car, Integer> {
     // Find all cars with a certain brand and mode
-    List<Car> findAllByBrandAndModel(String brand, String model);
+    List<Car> findAllByMakeAndModel(String make, String model);
 
     // Find the average price per day of all cars in the system
     @Query("SELECT AVG(c.pricePrDay) FROM Car c")

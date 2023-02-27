@@ -19,10 +19,13 @@ public class CarResponse {
     private int id;
 
     @JsonProperty
-    private String brand;
+    private String make;
 
     @JsonProperty
     private String model;
+
+    @JsonProperty
+    private String registrationNumber;
 
     @JsonProperty
     private double pricePrDay;
@@ -38,11 +41,12 @@ public class CarResponse {
 
     public CarResponse(Car car) {
         id = car.getId();
-        brand = car.getBrand();
+        make = car.getMake();
         model = car.getModel();
         pricePrDay = car.getPricePrDay();
         bestDiscount = car.getBestDiscount();
         created = car.getCreated();
         lastEdited = car.getLastEdited();
+        registrationNumber = car.getRegistrationNumber();
     }
 }

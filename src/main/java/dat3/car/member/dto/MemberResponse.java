@@ -66,7 +66,7 @@ public class MemberResponse {
                 .map(r -> ReservationResponse.builder()
                     .id(r.getId())
                     .carId(r.getCar().getId())
-                    .carBrand(r.getCar().getBrand())
+                    .carMake(r.getCar().getMake())
                     .rentalDate(r.getRentalDate())
                     .build())
                     .collect(Collectors.toList());

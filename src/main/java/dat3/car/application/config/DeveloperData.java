@@ -6,6 +6,8 @@ import dat3.car.member.dto.MemberRequest;
 import dat3.car.member.entity.Member;
 import dat3.car.member.repository.MemberRepository;
 import dat3.car.member.service.MemberService;
+import dat3.car.motorRegister.entity.MotorRegister;
+import dat3.car.motorRegister.repository.MotorRegisterRepository;
 import dat3.car.reservation.entity.Reservation;
 import dat3.car.reservation.repository.ReservationRepository;
 
@@ -33,10 +35,16 @@ public class DeveloperData implements ApplicationRunner {
     private ReservationRepository reservationRepository;
 
     @Autowired
-    List<Member> memberSamples;
+    private MotorRegisterRepository motorRegisterRepository;
 
     @Autowired
-    List<Car> carSamples;
+    private List<Member> memberSamples;
+
+    @Autowired
+    private List<Car> carSamples;
+
+    @Autowired
+    private List<MotorRegister> motorRegisterSamples;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -51,5 +59,7 @@ public class DeveloperData implements ApplicationRunner {
 
         reservationRepository.save(new Reservation(memberSamples.get(0), carSamples.get(0), LocalDateTime.now()));
         reservationRepository.save(new Reservation(memberSamples.get(1), carSamples.get(1), LocalDateTime.now()));
+        
+        motorRegisterRepository.saveAll(motorRegisterSamples);
     }
 }

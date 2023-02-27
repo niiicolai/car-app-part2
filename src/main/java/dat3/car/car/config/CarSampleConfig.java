@@ -12,15 +12,22 @@ import dat3.car.car.entity.Car;
 
 @Configuration
 public class CarSampleConfig {
+
+    // Real number which can be used to make an actual API request.
+    private static String realNumber = "DP14440";
+    
+    // Fake number connected to a fake response to save API requests. 
+    private static String fakeNumber = "JN79863";
+
     @Bean
     public List<Car> carSamples() {
         return Arrays.asList(new Car[] {
-            new Car("Toyota", "Camry", 150, 40000),
-            new Car("Honda", "Civic", 200, 35000),
-            new Car("Tesla", "Model 3", 350, 55000),
-            new Car("Ford", "Mustang", 580, 32000),
-            new Car("Chevrolet", "Corvette", 480, 75000),
-            new Car("Opel", "Kadett", 780, 25400)
+            new Car(realNumber, "Toyota", "Camry", 150, 40000),
+            new Car(realNumber,"Honda", "Civic", 200, 35000),
+            new Car(realNumber,"Tesla", "Model 3", 350, 55000),
+            new Car(fakeNumber,"Ford", "Mustang", 580, 32000),
+            new Car(fakeNumber,"Chevrolet", "Corvette", 480, 75000),
+            new Car(fakeNumber,"Opel", "Kadett", 780, 25400)
         });
     }
 

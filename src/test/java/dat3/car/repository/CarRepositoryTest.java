@@ -63,10 +63,10 @@ public class CarRepositoryTest {
 
 	@Test
 	void testFindCarByBrandAndModel() {
-		List<Car> cars = carRepository.findAllByBrandAndModel(carSamples.get(0).getBrand(), carSamples.get(0).getModel());
+		List<Car> cars = carRepository.findAllByMakeAndModel(carSamples.get(0).getMake(), carSamples.get(0).getModel());
 
 		assertEquals(1, cars.size());
-        assertEquals(carSamples.get(0).getBrand(), cars.get(0).getBrand());
+        assertEquals(carSamples.get(0).getMake(), cars.get(0).getMake());
         assertEquals(carSamples.get(0).getModel(), cars.get(0).getModel());
 	}
 
@@ -88,7 +88,7 @@ public class CarRepositoryTest {
 		List<Car> cars = carRepository.findAllWithBestDiscount();
 
 		assertEquals(1, cars.size());
-        assertEquals(carSample.getBrand(), cars.get(0).getBrand());
+        assertEquals(carSample.getMake(), cars.get(0).getMake());
         assertEquals(carSample.getModel(), cars.get(0).getModel());
 	}
 

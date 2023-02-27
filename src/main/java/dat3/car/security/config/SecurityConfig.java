@@ -100,6 +100,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/reservations").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.PATCH, "/api/v1/reservations").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/reservations/**").hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.GET, "/api/v1/motor/register/**").hasAnyRole("MEMBER", "ADMIN")
                 
                 //.requestMatchers(adminPaths).hasRole("ADMIN")
 

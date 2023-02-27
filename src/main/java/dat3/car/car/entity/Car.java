@@ -24,36 +24,34 @@ import dat3.car.reservation.entity.Reservation;
 @Getter 
 @Setter 
 public class Car {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private int id;
+    @Column(name = "rental_price_day")
+    private double pricePrDay;
 
-  @Column(name = "car_brand", length = 50)
-  private String brand;
+    @Column(name = "max_discount")
+    private int bestDiscount;
 
-  @Column(name = "car_model", length = 60)
-  private String model;
+    @CreationTimestamp
+    private LocalDateTime created;
 
-  @Column(name = "rental_price_day")
-  private double pricePrDay;
+    @UpdateTimestamp
+    private LocalDateTime lastEdited;
 
-  @Column(name = "max_discount")
-  private int bestDiscount;
+    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY)
+    private List<Reservation> reservations;
 
-  @CreationTimestamp
-  private LocalDateTime created;
+    private String registrationNumber;
+    private String make;
+    private String model;
 
-  @UpdateTimestamp
-  private LocalDateTime lastEdited;
-
-  @OneToMany(mappedBy = "car", fetch = FetchType.LAZY)
-  private List<Reservation> reservations;
-
-  public Car(String brand, String model, double pricePrDay, int bestDiscount) {
-    this.brand = brand;
-    this.model = model;
-    this.pricePrDay = pricePrDay;
-    this.bestDiscount = bestDiscount;
-  }
+    public Car(String registrationNumber, String make, String model, double pricePrDay, int bestDiscount) {
+      this.registrationNumber = registrationNumber;
+      this.make = make;
+      this.model = model;
+      this.pricePrDay = pricePrDay;
+      this.bestDiscount = bestDiscount;
+    }
 }

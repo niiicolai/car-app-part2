@@ -85,14 +85,14 @@ public class CarServiceTest {
 	void testFind() {
 		CarResponse response = carService.find(carSamples.get(0).getId());
 
-		assertEquals(carSamples.get(0).getBrand(), response.getBrand());
+		assertEquals(carSamples.get(0).getMake(), response.getMake());
 	}
 
 	@Test
 	void testCreate() {
 		CarResponse response = carService.create(carRequestSamples.get(2));
 
-		assertEquals(carSamples.get(2).getBrand(), response.getBrand());
+		assertEquals(carSamples.get(2).getMake(), response.getMake());
 	}
 
 	@Test
@@ -119,12 +119,12 @@ public class CarServiceTest {
 
 	@Test
 	void testFindAllByBrandAndModel() {
-		List<CarResponse> responses = carService.findAllByBrandAndModel(
-			carSamples.get(0).getBrand(), carSamples.get(0).getModel()
+		List<CarResponse> responses = carService.findAllByMakeAndModel(
+			carSamples.get(0).getMake(), carSamples.get(0).getModel()
 		);
 
 		assertEquals(1, responses.size());
-		assertEquals(carSamples.get(0).getBrand(), responses.get(0).getBrand());
+		assertEquals(carSamples.get(0).getMake(), responses.get(0).getMake());
 		assertEquals(carSamples.get(0).getModel(), responses.get(0).getModel());
 	}
 

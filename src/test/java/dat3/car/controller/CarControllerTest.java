@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Import;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import dat3.car.config.ObjectMapperConfig;
+import dat3.car.config.ObjectMapperTestConfig;
 import dat3.car.config.SampleTestConfig;
 import dat3.car.car.api.CarController;
 import dat3.car.car.dto.CarRequest;
@@ -29,7 +29,7 @@ import dat3.car.car.repository.CarRepository;
 import dat3.car.car.service.CarService;
 
 @DataJpaTest
-@Import({SampleTestConfig.class, ObjectMapperConfig.class})
+@Import({SampleTestConfig.class, ObjectMapperTestConfig.class})
 public class CarControllerTest {    
 
     @Autowired
@@ -70,7 +70,7 @@ public class CarControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(2)))
-				.andExpect(jsonPath("$.[0].brand", is(carSamples.get(0).getBrand())));
+				.andExpect(jsonPath("$.[0].make", is(carSamples.get(0).getMake())));
 	}
 
     @Test
@@ -78,7 +78,7 @@ public class CarControllerTest {
         mockMvc.perform(get(String.format("/api/v1/cars/%s", carSamples.get(0).getId())))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.brand", is(carSamples.get(0).getBrand())));
+				.andExpect(jsonPath("$.make", is(carSamples.get(0).getMake())));
 	}
 
 	@Test
@@ -89,7 +89,7 @@ public class CarControllerTest {
 					.characterEncoding("utf-8"))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.brand", is(carSamples.get(2).getBrand())));
+				.andExpect(jsonPath("$.make", is(carSamples.get(2).getMake())));
 	}
 
 	@Test
@@ -116,12 +116,12 @@ public class CarControllerTest {
 
 	@Test
 	void testFindAllByBrandAndModel() throws Exception {
-		String url = String.format("/api/v1/cars/by/%s/%s", carSamples.get(0).getBrand(), carSamples.get(0).getModel());
+		String url = String.format("/api/v1/cars/by/%s/%s", carSamples.get(0).getMake(), carSamples.get(0).getModel());
 		mockMvc.perform(get(url))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(1)))
-				.andExpect(jsonPath("$.[0].brand", is(carSamples.get(0).getBrand())))
+				.andExpect(jsonPath("$.[0].make", is(carSamples.get(0).getMake())))
 				.andExpect(jsonPath("$.[0].model", is(carSamples.get(0).getModel())));
 	}
 
@@ -143,7 +143,7 @@ public class CarControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(1)))
-				.andExpect(jsonPath("$.[0].brand", is(carSamples.get(1).getBrand())))
+				.andExpect(jsonPath("$.[0].make", is(carSamples.get(1).getMake())))
 				.andExpect(jsonPath("$.[0].model", is(carSamples.get(1).getModel())));
 	}
 
@@ -154,7 +154,7 @@ public class CarControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(2)))
-				.andExpect(jsonPath("$.[0].brand", is(carSamples.get(0).getBrand())))
+				.andExpect(jsonPath("$.[0].make", is(carSamples.get(0).getMake())))
 				.andExpect(jsonPath("$.[0].model", is(carSamples.get(0).getModel())));
 	}
 }
