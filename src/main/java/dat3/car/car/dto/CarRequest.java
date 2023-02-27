@@ -22,6 +22,9 @@ public class CarRequest {
     private String model;
 
     @JsonProperty
+    private String registrationNumber;
+
+    @JsonProperty
     private double pricePrDay;
 
     @JsonProperty
@@ -33,9 +36,10 @@ public class CarRequest {
         model = car.getModel();
         pricePrDay = car.getPricePrDay();
         bestDiscount = car.getBestDiscount();
+        registrationNumber = car.getRegistrationNumber();
     }
 
     public Car toCar() {
-        return new Car(make, model, pricePrDay, bestDiscount);
+        return new Car(registrationNumber, make, model, pricePrDay, bestDiscount);
     }
 }

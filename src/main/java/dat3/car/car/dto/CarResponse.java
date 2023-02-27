@@ -25,6 +25,9 @@ public class CarResponse {
     private String model;
 
     @JsonProperty
+    private String registrationNumber;
+
+    @JsonProperty
     private double pricePrDay;
 
     @JsonProperty
@@ -44,5 +47,6 @@ public class CarResponse {
         bestDiscount = car.getBestDiscount();
         created = car.getCreated();
         lastEdited = car.getLastEdited();
+        registrationNumber = car.getRegistrationNumber();
     }
 }

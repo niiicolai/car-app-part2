@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dat3.car.car.entity.Car;
 import dat3.car.car.repository.CarRepository;
-import dat3.car.config.ObjectMapperConfig;
+import dat3.car.config.ObjectMapperTestConfig;
 import dat3.car.config.SampleTestConfig;
 import dat3.car.member.entity.Member;
 import dat3.car.member.repository.MemberRepository;
@@ -37,7 +37,7 @@ import dat3.car.reservation.repository.ReservationRepository;
 import dat3.car.reservation.service.ReservationService;
 
 @DataJpaTest
-@Import({SampleTestConfig.class, ObjectMapperConfig.class})
+@Import({SampleTestConfig.class, ObjectMapperTestConfig.class})
 public class ReservationControllerTest {
     
     @Autowired

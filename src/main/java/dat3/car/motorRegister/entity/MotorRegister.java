@@ -2,52 +2,62 @@ package dat3.car.motorRegister.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 @Getter 
 @Setter 
+@Entity
 public class MotorRegister {
     
+    @Id
     private String registrationNumber;
-
-    private String state;
     
-    private LocalDateTime stateDate;
-
+    private String status; 
+    
+    private String statusDate;
+    
     private String type;
-
+    
+    // Note: A column cannot be named 'use' in MySQL.
+    @Column(name = "purpose")
     private String use;
-
-    private LocalDateTime firstRegistration;
-
+    
+    private String firstRegistration;
+    
     private String vin;
-
+    
     private int doors;
-
-    protected String make;
-
-    protected String model;
-
+    
+    private String make;
+    
+    private String model;
+    
     private String variant;
-
+    
     private String modelType;
-
+    
     private String color;
-
+    
     private String fuelType;
-
+    
     private boolean isLeasing;
+    
+    private String leasingFrom;
+    
+    private String leasingTo;
 
-    private LocalDateTime leasingFrom;
+    @CreationTimestamp
+    private LocalDateTime created;
 
-    private LocalDateTime leasingTo;
+    @UpdateTimestamp
+    private LocalDateTime lastEdited;
 }

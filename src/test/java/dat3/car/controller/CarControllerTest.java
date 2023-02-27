@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Import;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import dat3.car.config.ObjectMapperConfig;
+import dat3.car.config.ObjectMapperTestConfig;
 import dat3.car.config.SampleTestConfig;
 import dat3.car.car.api.CarController;
 import dat3.car.car.dto.CarRequest;
@@ -29,7 +29,7 @@ import dat3.car.car.repository.CarRepository;
 import dat3.car.car.service.CarService;
 
 @DataJpaTest
-@Import({SampleTestConfig.class, ObjectMapperConfig.class})
+@Import({SampleTestConfig.class, ObjectMapperTestConfig.class})
 public class CarControllerTest {    
 
     @Autowired

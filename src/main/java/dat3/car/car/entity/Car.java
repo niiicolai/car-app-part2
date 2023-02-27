@@ -17,7 +17,6 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import dat3.car.motorRegister.entity.MotorRegister;
 import dat3.car.reservation.entity.Reservation;
 
 @Entity
@@ -25,33 +24,34 @@ import dat3.car.reservation.entity.Reservation;
 @Getter 
 @Setter 
 public class Car {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private int id;
+    @Column(name = "rental_price_day")
+    private double pricePrDay;
 
-  @Column(name = "rental_price_day")
-  private double pricePrDay;
+    @Column(name = "max_discount")
+    private int bestDiscount;
 
-  @Column(name = "max_discount")
-  private int bestDiscount;
+    @CreationTimestamp
+    private LocalDateTime created;
 
-  @CreationTimestamp
-  private LocalDateTime created;
+    @UpdateTimestamp
+    private LocalDateTime lastEdited;
 
-  @UpdateTimestamp
-  private LocalDateTime lastEdited;
+    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY)
+    private List<Reservation> reservations;
 
-  @OneToMany(mappedBy = "car", fetch = FetchType.LAZY)
-  private List<Reservation> reservations;
+    private String registrationNumber;
+    private String make;
+    private String model;
 
-  String make;
-  String model;
-
-  public Car(String make, String model, double pricePrDay, int bestDiscount) {
-    this.make = make;
-    this.model = model;
-    this.pricePrDay = pricePrDay;
-    this.bestDiscount = bestDiscount;
-  }
+    public Car(String registrationNumber, String make, String model, double pricePrDay, int bestDiscount) {
+      this.registrationNumber = registrationNumber;
+      this.make = make;
+      this.model = model;
+      this.pricePrDay = pricePrDay;
+      this.bestDiscount = bestDiscount;
+    }
 }

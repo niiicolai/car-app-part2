@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.boot.test.context.TestConfiguration;
 
 @TestConfiguration
-public class ObjectMapperConfig {
+public class ObjectMapperTestConfig {
 
     // På grund af en fejlbesked om at ObjectMapper ikke understøtter LocalDateTime,
     // så har jeg lavet nedenstående bean, som laver en objectmapper,

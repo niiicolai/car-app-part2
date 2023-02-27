@@ -30,7 +30,7 @@ public class CarService {
     public CarResponse find(int id) {
         Optional<Car> carOpt = carRepository.findById(id);
         if (carOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car with <ID> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car with <ID> doesn't exist!");
 
         return new CarResponse(carOpt.get());
     }
@@ -43,7 +43,7 @@ public class CarService {
     public CarResponse update(CarRequest carRequest) {
         Optional<Car> carOpt = carRepository.findById(carRequest.getId());
         if (carOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car with <ID> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car with <ID> doesn't exist!");
         
         Car car = carOpt.get();
         car.setMake(carRequest.getMake());
@@ -58,7 +58,7 @@ public class CarService {
     public void delete(int id) {
         Optional<Car> carOpt = carRepository.findById(id);
         if (carOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car with <ID> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car with <ID> doesn't exist!");
 
         carRepository.delete(carOpt.get());
     }
