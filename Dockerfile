@@ -5,8 +5,12 @@ ENV JDBC_DATABASE=cars
 ENV JDBC_DATABASE_URL=jdbc:mysql://localhost:3306/${JDBC_DATABASE}
 ENV JDBC_USERNAME $(uuidgen | cut -c1-12)
 ENV JDBC_PASSWORD $(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
+
 ENV APP_TOKEN_ISSUER $(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
 ENV APP_SECRET_KEY $(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
+
+ENV MOTOR_API_URL ${MOTOR_API_URL}
+ENV MOTOR_API_KEY ${MOTOR_API_KEY}
 
 # Install OpenJDK 17 slim
 RUN apt-get update && \

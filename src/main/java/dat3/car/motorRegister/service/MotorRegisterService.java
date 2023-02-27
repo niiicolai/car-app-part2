@@ -1,19 +1,13 @@
 package dat3.car.motorRegister.service;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 

@@ -1,8 +1,5 @@
 package dat3.car.motorRegister.dto;
 
-import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
