@@ -49,10 +49,10 @@ public class CarController {
     }
 
     // Role: ANONYMOUS
-    @GetMapping("/by/{brand}/{model}")
-    public List<CarResponse> findAllByBrandAndModel(@PathVariable("brand") String brand, 
+    @GetMapping("/by/{make}/{model}")
+    public List<CarResponse> findAllByBrandAndModel(@PathVariable("make") String make, 
             @PathVariable("model") String model) {
-        return carService.findAllByBrandAndModel(brand, model);
+        return carService.findAllByMakeAndModel(make, model);
     }
 
     // Role: ANONYMOUS

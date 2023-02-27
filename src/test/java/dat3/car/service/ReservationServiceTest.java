@@ -86,7 +86,7 @@ public class ReservationServiceTest {
     void testFind() {
         ReservationResponse response = reservationService.find(reservationSamples.get(0).getId());
 
-        assertEquals(reservationSamples.get(0).getCar().getBrand(), response.getCarBrand());
+        assertEquals(reservationSamples.get(0).getCar().getMake(), response.getCarMake());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class ReservationServiceTest {
 			new Reservation(memberSamples.get(2), carSamples.get(2), LocalDate.now().plusDays(1).atStartOfDay()));
         ReservationResponse response = reservationService.create(request);
 
-        assertEquals(carSamples.get(2).getBrand(), response.getCarBrand());
+        assertEquals(carSamples.get(2).getMake(), response.getCarMake());
     }
 
     @Test

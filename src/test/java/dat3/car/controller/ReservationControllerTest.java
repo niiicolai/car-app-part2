@@ -93,7 +93,7 @@ public class ReservationControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(2)))
-				.andExpect(jsonPath("$.[0].carBrand", is(reservationSamples.get(0).getCar().getBrand())));
+				.andExpect(jsonPath("$.[0].carMake", is(reservationSamples.get(0).getCar().getMake())));
 	}
 
     @Test
@@ -101,7 +101,7 @@ public class ReservationControllerTest {
         mockMvc.perform(get(String.format("/api/v1/reservations/%s", reservationSamples.get(0).getId())))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.carBrand", is(reservationSamples.get(0).getCar().getBrand())));
+				.andExpect(jsonPath("$.carMake", is(reservationSamples.get(0).getCar().getMake())));
 	}
 
 	@Test
@@ -115,7 +115,7 @@ public class ReservationControllerTest {
 					.characterEncoding("utf-8"))
                 .andDo(print())
                 .andExpect(status().isOk())
-				.andExpect(jsonPath("$.carBrand", is(carSamples.get(2).getBrand())));
+				.andExpect(jsonPath("$.carMake", is(carSamples.get(2).getMake())));
 	}
 
 	@Test
@@ -150,7 +150,7 @@ public class ReservationControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(1)))
-				.andExpect(jsonPath("$.[0].carBrand", is(reservationSamples.get(0).getCar().getBrand())));
+				.andExpect(jsonPath("$.[0].carMake", is(reservationSamples.get(0).getCar().getMake())));
 	}
 
 	@Test

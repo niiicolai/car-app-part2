@@ -46,7 +46,7 @@ public class CarService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car with <ID> doesn't exist!");
         
         Car car = carOpt.get();
-        car.setBrand(carRequest.getBrand());
+        car.setMake(carRequest.getMake());
         car.setModel(carRequest.getModel());
         car.setBestDiscount(carRequest.getBestDiscount());
         car.setPricePrDay(carRequest.getPricePrDay());
@@ -63,8 +63,8 @@ public class CarService {
         carRepository.delete(carOpt.get());
     }
 
-    public List<CarResponse> findAllByBrandAndModel(String brand, String model) {
-        List<Car> cars = carRepository.findAllByBrandAndModel(brand, model);
+    public List<CarResponse> findAllByMakeAndModel(String make, String model) {
+        List<Car> cars = carRepository.findAllByMakeAndModel(make, model);
         return cars.stream().map(car -> new CarResponse(car)).collect(Collectors.toList());
     }
 

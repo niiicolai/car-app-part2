@@ -16,7 +16,7 @@ public class CarRequest {
     private int id;
 
     @JsonProperty
-    private String brand;
+    private String make;
 
     @JsonProperty
     private String model;
@@ -29,13 +29,13 @@ public class CarRequest {
 
     public CarRequest(Car car) {
         id = car.getId();
-        brand = car.getBrand();
+        make = car.getMake();
         model = car.getModel();
         pricePrDay = car.getPricePrDay();
         bestDiscount = car.getBestDiscount();
     }
 
     public Car toCar() {
-        return new Car(brand, model, pricePrDay, bestDiscount);
+        return new Car(make, model, pricePrDay, bestDiscount);
     }
 }

@@ -17,6 +17,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import dat3.car.motorRegister.entity.MotorRegister;
 import dat3.car.reservation.entity.Reservation;
 
 @Entity
@@ -28,12 +29,6 @@ public class Car {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private int id;
-
-  @Column(name = "car_brand", length = 50)
-  private String brand;
-
-  @Column(name = "car_model", length = 60)
-  private String model;
 
   @Column(name = "rental_price_day")
   private double pricePrDay;
@@ -50,8 +45,11 @@ public class Car {
   @OneToMany(mappedBy = "car", fetch = FetchType.LAZY)
   private List<Reservation> reservations;
 
-  public Car(String brand, String model, double pricePrDay, int bestDiscount) {
-    this.brand = brand;
+  String make;
+  String model;
+
+  public Car(String make, String model, double pricePrDay, int bestDiscount) {
+    this.make = make;
     this.model = model;
     this.pricePrDay = pricePrDay;
     this.bestDiscount = bestDiscount;
