@@ -48,7 +48,7 @@ public class ReservationService {
         return new ReservationResponse(reservationOpt.get());
     }
     
-    public ReservationResponse create(ReservationRequest reservationRequest) {
+    public ReservationResponse create(ReservationRequest reservationRequest) throws ResponseStatusException {
         Optional<Car> carOpt = carRepository.findById(reservationRequest.getCarId());
         if (carOpt.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car with <id> doesn't exist!");
