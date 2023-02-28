@@ -25,6 +25,7 @@ class Api {
             method: 'GET',
             headers: this.headers()
         });
+
         if (!response.ok) {
             errorCallback(await response.json())
         } else {
@@ -33,26 +34,25 @@ class Api {
         }
     };
 
-    static post(endpoint, data, callback, errorCallback) {
-        const uri = `${this.fullpath()}${endpoint}`;
-        fetch(uri, {
+    static async post(endpoint, data, callback, errorCallback) {
+        let response;
+        try {
+            const uri = `${this.fullpath()}${endpoint}`;
+            response = await fetch(uri, {
             method: 'POST',
             headers: this.headers(),
             body: JSON.stringify(data)
-        })
-        .then((response) => {
-            return response.json()
-        })
-        .then((json) => {
-            if (json.error) 
-                errorCallback(json)
-            else
-                callback(json);
-        })
-        .catch((error) => {
-            console.log("error:" + error)
-            errorCallback(error)
         });
+        } catch (error) {
+        console.log('There was an error', error);
+        }
+
+        if (!response.ok) {
+            errorCallback(await response.json())
+        } else {
+            callback(await response.json());
+            errorCallback({});
+        }
     };
 
     static async patch(endpoint, data, callback, errorCallback) {
@@ -62,7 +62,6 @@ class Api {
             headers: this.headers(),
             body: JSON.stringify(data)
         });
-        
 
         if (!response.ok) {
             errorCallback(await response.json())
