@@ -27,10 +27,10 @@ public class CarService {
         return cars.stream().map(car -> new CarResponse(car)).collect(Collectors.toList());
     }
 
-    public CarResponse find(int id) {
+    public CarResponse find(int id) throws ResponseStatusException {
         Optional<Car> carOpt = carRepository.findById(id);
         if (carOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car with <ID> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car with <ID> doesn't exist!");
 
         return new CarResponse(carOpt.get());
     }
@@ -40,10 +40,10 @@ public class CarService {
         return new CarResponse(car);
     }
 
-    public CarResponse update(CarRequest carRequest) {
+    public CarResponse update(CarRequest carRequest) throws ResponseStatusException {
         Optional<Car> carOpt = carRepository.findById(carRequest.getId());
         if (carOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car with <ID> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car with <ID> doesn't exist!");
         
         Car car = carOpt.get();
         car.setMake(carRequest.getMake());
@@ -55,10 +55,10 @@ public class CarService {
         return new CarResponse(car);
     }
 
-    public void delete(int id) {
+    public void delete(int id) throws ResponseStatusException {
         Optional<Car> carOpt = carRepository.findById(id);
         if (carOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car with <ID> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car with <ID> doesn't exist!");
 
         carRepository.delete(carOpt.get());
     }

@@ -2,8 +2,11 @@ package dat3.car.car.api;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import dat3.car.application.dto.ErrorResponse;
 import dat3.car.car.dto.CarRequest;
 import dat3.car.car.dto.CarResponse;
 import dat3.car.car.service.CarService;
@@ -26,8 +29,12 @@ public class CarController {
 
     // Role: ANONYMOUS
     @GetMapping("/{id}")
-    public CarResponse find(@PathVariable("id") int id) {
-        return carService.find(id);
+    public Object find(@PathVariable("id") int id) {
+        try {
+            return carService.find(id);
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
+        }
     }
 
     // Role: ADMIN
@@ -38,14 +45,23 @@ public class CarController {
 
     // Role: ADMIN
     @PatchMapping
-    public CarResponse update(@RequestBody CarRequest carRequest) {
-        return carService.update(carRequest);
+    public Object update(@RequestBody CarRequest carRequest) {
+        try {
+            return carService.update(carRequest);
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
+        }
     }
 
     // Role: ADMIN
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") int id) {
-        carService.delete(id);
+    public Object delete(@PathVariable("id") int id) {
+        try {
+            carService.delete(id);
+            return ResponseEntity.ok();
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
+        }
     }
 
     // Role: ANONYMOUS

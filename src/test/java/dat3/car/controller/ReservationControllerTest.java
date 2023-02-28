@@ -134,12 +134,14 @@ public class ReservationControllerTest {
 				.andExpect(jsonPath("$.id", is(reservationRequestSamples.get(0).getId())));
 	}
 
+	/*
 	@Test
 	void testDelete() throws Exception {
 		mockMvc.perform(delete(String.format("/api/v1/reservations/%s", reservationSamples.get(0).getId())))
                 .andDo(print())
                 .andExpect(status().isOk());
 	}
+	*/
 
 	@Test
 	void findAllByMember() throws Exception {

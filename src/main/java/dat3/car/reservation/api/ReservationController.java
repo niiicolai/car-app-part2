@@ -29,8 +29,12 @@ public class ReservationController {
 
     // Role: MEMBER
     @GetMapping("/{id}")
-    public ReservationResponse find(@PathVariable("id") int id) {
-        return reservationService.find(id);
+    public Object find(@PathVariable("id") int id) {
+        try {
+            return reservationService.find(id);
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
+        }
     }
 
     // Role: MEMBER
@@ -39,31 +43,48 @@ public class ReservationController {
         try {
             return reservationService.create(reservationRequest);
         } catch (ResponseStatusException e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getStatusCode(), e.getReason()));
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
         }
     }
 
     // Role: ADMIN
     @PatchMapping
-    public ReservationResponse update(@RequestBody ReservationRequest reservationRequest) {
-        return reservationService.update(reservationRequest);
+    public Object update(@RequestBody ReservationRequest reservationRequest) {
+        try {
+            return reservationService.update(reservationRequest);
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
+        }
     }
 
     // Role: ADMIN
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") int id) {
-        reservationService.delete(id);
+    public Object delete(@PathVariable("id") int id) {
+        try {
+            reservationService.delete(id);
+            return ResponseEntity.ok();
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
+        }
     }
 
     // Role: MEMBER
     @GetMapping("/find-all-by-member/{username}")
-    public List<ReservationResponse> findAllByMember(@PathVariable("username") String username) {
-        return reservationService.findAllByMember(username);
+    public Object findAllByMember(@PathVariable("username") String username) {
+        try {
+            return reservationService.findAllByMember(username);
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
+        }
     }
 
     // Role: MEMBER
     @GetMapping("/count-by-member/{username}")
-    public int countByMember(@PathVariable("username") String username) {
-        return reservationService.countByMember(username);
+    public Object countByMember(@PathVariable("username") String username) {
+        try {
+            return reservationService.countByMember(username);
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
+        }
     }
 }
