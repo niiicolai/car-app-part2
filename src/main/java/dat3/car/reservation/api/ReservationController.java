@@ -2,8 +2,11 @@ package dat3.car.reservation.api;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import dat3.car.application.dto.ErrorResponse;
 import dat3.car.reservation.dto.ReservationRequest;
 import dat3.car.reservation.dto.ReservationResponse;
 import dat3.car.reservation.service.ReservationService;
@@ -32,8 +35,12 @@ public class ReservationController {
 
     // Role: MEMBER
     @PostMapping
-    public ReservationResponse create(@RequestBody ReservationRequest reservationRequest) {
-        return reservationService.create(reservationRequest);
+    public Object create(@RequestBody ReservationRequest reservationRequest) {
+        try {
+            return reservationService.create(reservationRequest);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getStatusCode(), e.getReason()));
+        }
     }
 
     // Role: ADMIN

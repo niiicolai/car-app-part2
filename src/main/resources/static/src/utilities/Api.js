@@ -35,17 +35,12 @@ class Api {
     };
 
     static async post(endpoint, data, callback, errorCallback) {
-        let response;
-        try {
-            const uri = `${this.fullpath()}${endpoint}`;
-            response = await fetch(uri, {
+        const uri = `${this.fullpath()}${endpoint}`;
+        const response = await fetch(uri, {
             method: 'POST',
             headers: this.headers(),
             body: JSON.stringify(data)
         });
-        } catch (error) {
-        console.log('There was an error', error);
-        }
 
         if (!response.ok) {
             errorCallback(await response.json())
