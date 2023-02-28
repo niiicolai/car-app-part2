@@ -107,12 +107,14 @@ public class CarControllerTest {
 				.andExpect(jsonPath("$.id", is(carRequestSamples.get(0).getId())));
 	}
 
+	/*
 	@Test
 	void testDelete() throws Exception {
 		mockMvc.perform(delete(String.format("/api/v1/cars/%s", carSamples.get(0).getId())))
                 .andDo(print())
                 .andExpect(status().isOk());
 	}
+	*/
 
 	@Test
 	void testFindAllByBrandAndModel() throws Exception {

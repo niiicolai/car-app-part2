@@ -40,10 +40,10 @@ public class ReservationService {
         return reservations.stream().map(reservation -> new ReservationResponse(reservation)).collect(Collectors.toList());
     }
 
-    public ReservationResponse find(int id) {
+    public ReservationResponse find(int id) throws ResponseStatusException {
         Optional<Reservation> reservationOpt = reservationRepository.findById(id);
         if (reservationOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reservation with <ID> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation with <ID> doesn't exist!");
 
         return new ReservationResponse(reservationOpt.get());
     }
@@ -51,11 +51,11 @@ public class ReservationService {
     public ReservationResponse create(ReservationRequest reservationRequest) throws ResponseStatusException {
         Optional<Car> carOpt = carRepository.findById(reservationRequest.getCarId());
         if (carOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car with <id> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car with <id> doesn't exist!");
 
         Optional<Member> memberOpt = memberRepository.findById(reservationRequest.getMemberUsername());
         if (memberOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member with <USERNAME> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member with <USERNAME> doesn't exist!");
 
         LocalDateTime rentalDate = reservationRequest.getRentalDate().atStartOfDay();
         if (rentalDate.isBefore(LocalDateTime.now()))
@@ -70,10 +70,10 @@ public class ReservationService {
         return new ReservationResponse(reservation);
     }
 
-    public ReservationResponse update(ReservationRequest reservationRequest) {
+    public ReservationResponse update(ReservationRequest reservationRequest) throws ResponseStatusException {
         Optional<Reservation> reservationOpt = reservationRepository.findById(reservationRequest.getId());
         if (reservationOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reservation with <ID> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation with <ID> doesn't exist!");
 
         LocalDateTime rentalDate = reservationRequest.getRentalDate().atStartOfDay();
         if (rentalDate.isBefore(LocalDateTime.now()))
@@ -90,27 +90,27 @@ public class ReservationService {
         return new ReservationResponse(reservation);
     }
 
-    public void delete(int id) {
+    public void delete(int id) throws ResponseStatusException {
         Optional<Reservation> reservationOpt = reservationRepository.findById(id);
         if (reservationOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reservation with <ID> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation with <ID> doesn't exist!");
 
         reservationRepository.delete(reservationOpt.get());
     }
 
-    public List<ReservationResponse> findAllByMember(String username) {
+    public List<ReservationResponse> findAllByMember(String username) throws ResponseStatusException {
         Optional<Member> memberOpt = memberRepository.findById(username);
         if (memberOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member with <USERNAME> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member with <USERNAME> doesn't exist!");
 
         List<Reservation> reservations = reservationRepository.findAllByMember(memberOpt.get());
         return reservations.stream().map(reservation -> new ReservationResponse(reservation)).collect(Collectors.toList());
     }
 
-    public int countByMember(String username) {
+    public int countByMember(String username) throws ResponseStatusException {
         Optional<Member> memberOpt = memberRepository.findById(username);
         if (memberOpt.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member with <USERNAME> doesn't exist!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member with <USERNAME> doesn't exist!");
 
         return reservationRepository.countByMember(memberOpt.get());
     }

@@ -11,8 +11,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorResponse {
-    @JsonProperty
-    private HttpStatusCode status;
 
     @JsonProperty
     private String message;

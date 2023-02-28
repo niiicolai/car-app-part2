@@ -2,8 +2,11 @@ package dat3.car.member.api;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import dat3.car.application.dto.ErrorResponse;
 import dat3.car.member.dto.MemberRequest;
 import dat3.car.member.dto.MemberResponse;
 import dat3.car.member.service.MemberService;
@@ -26,26 +29,43 @@ public class MemberController {
 
     // Role: MEMBER
     @GetMapping("/{username}")
-    public MemberResponse find(@PathVariable("username") String username) {
-        return memberService.find(username);
+    public Object find(@PathVariable("username") String username) {
+        try {
+            return memberService.find(username);
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
+        }
     }    
 
     // Role: ANONYMOUS
     @PostMapping
-    public MemberResponse create(@RequestBody MemberRequest memberRequest) {
-        return memberService.create(memberRequest);
+    public Object create(@RequestBody MemberRequest memberRequest) {
+        try {
+            return memberService.create(memberRequest);
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
+        }
     }
 
     // Role: MEMBER
     @PatchMapping
-    public MemberResponse update(@RequestBody MemberRequest memberRequest) {
-        return memberService.update(memberRequest);
+    public Object update(@RequestBody MemberRequest memberRequest) {
+        try {
+            return memberService.update(memberRequest);
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
+        }
     }
 
     // Role: ADMIN
     @DeleteMapping("/{username}")
-    public void delete(@PathVariable("username") String username) {
-        memberService.delete(username);
+    public Object delete(@PathVariable("username") String username) {
+        try {
+            memberService.delete(username);
+            return ResponseEntity.ok();
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(new ErrorResponse(e.getReason()), e.getStatusCode());
+        }
     }
 
     // Role: ADMIN

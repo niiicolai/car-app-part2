@@ -31,7 +31,7 @@ public class MemberService {
         return members.stream().map(member -> new MemberResponse(member)).collect(Collectors.toList());
     }
 
-    public MemberResponse find(String username) {
+    public MemberResponse find(String username) throws ResponseStatusException {
         Optional<Member> memberOpt = memberRepository.findById(username);
         if (memberOpt.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member with <USERNAME> doesn't exist!");
@@ -39,7 +39,7 @@ public class MemberService {
         return new MemberResponse(memberOpt.get());
     }
 
-    public MemberResponse create(MemberRequest memberRequest) {
+    public MemberResponse create(MemberRequest memberRequest) throws ResponseStatusException {
         if (memberRepository.existsById(memberRequest.getUsername()))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member with <USERNAME> already exist!");
         Member member = memberRequest.toMember();
@@ -49,7 +49,7 @@ public class MemberService {
         return new MemberResponse(member);
     }
 
-    public MemberResponse update(MemberRequest memberRequest) {
+    public MemberResponse update(MemberRequest memberRequest) throws ResponseStatusException {
         Optional<Member> memberOpt = memberRepository.findById(memberRequest.getUsername());
         if (memberOpt.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member with <USERNAME> doesn't exist!");
@@ -66,7 +66,7 @@ public class MemberService {
         return new MemberResponse(member);
     }
 
-    public void delete(String username) {
+    public void delete(String username) throws ResponseStatusException {
         Optional<Member> memberOpt = memberRepository.findById(username);
         if (memberOpt.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member with <USERNAME> doesn't exist!");

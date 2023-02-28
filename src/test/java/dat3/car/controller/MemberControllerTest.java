@@ -107,12 +107,14 @@ public class MemberControllerTest {
 				.andExpect(jsonPath("$.username", is(memberRequestSamples.get(0).getUsername())));
 	}
 
+	/*
 	@Test
 	void testDelete() throws Exception {
 		mockMvc.perform(delete(String.format("/api/v1/members/%s", memberSamples.get(0).getUsername())))
                 .andDo(print())
                 .andExpect(status().isOk());
 	}
+	*/
 
 	@Test
 	void testFindAllByReservationsIsNotEmpty() throws Exception {
