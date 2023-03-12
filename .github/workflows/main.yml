@@ -5,7 +5,7 @@ on:
     branches:
       - main
 env:
-  JDBC_DATABASE_URL: ${{ secrets.JDBC_DATABASE_URL }}
+  JDBC_DATABASE_URL2: ${{ secrets.JDBC_DATABASE_URL2 }}
   JDBC_PASSWORD: ${{ secrets.JDBC_PASSWORD }}
   JDBC_USERNAME: ${{ secrets.JDBC_USERNAME }}
 
@@ -56,4 +56,4 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          bash deploy.sh
+          bash deploy2.sh
