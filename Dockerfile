@@ -35,4 +35,4 @@ RUN ./mvnw package
 
 EXPOSE 8081
 
-CMD ["sh", "-c", "service mysql start && java -jar target/car-0.0.1-SNAPSHOT.jar"]
+CMD ["sh", "-c", "java -jar target/car-0.0.1-SNAPSHOT.jar"]
