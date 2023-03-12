@@ -5,9 +5,14 @@ on:
     branches:
       - main
 env:
+  JDBC_DATABASE: ${{ secrets.JDBC_DATABASE }}
   JDBC_DATABASE_URL2: ${{ secrets.JDBC_DATABASE_URL2 }}
-  JDBC_PASSWORD: ${{ secrets.JDBC_PASSWORD }}
   JDBC_USERNAME: ${{ secrets.JDBC_USERNAME }}
+  JDBC_PASSWORD: ${{ secrets.JDBC_PASSWORD }}
+  APP_TOKEN_ISSUER: ${{ secrets.APP_TOKEN_ISSUER }}
+  APP_SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
+  MOTOR_API_URL: ${{ secrets.MOTOR_API_URL }}
+  MOTOR_API_KEY: ${{ secrets.MOTOR_API_KEY }}
 
 jobs:
   build:
@@ -52,7 +57,16 @@ jobs:
       - name: Build and save Docker image
         run: |
           IMAGE_TAG=backend-client
-          docker build -t $IMAGE_TAG .
+          docker build -t $IMAGE_TAG \
+            --build-arg JDBC_DATABASE=$JDBC_DATABASE \
+            --build-arg JDBC_DATABASE_URL2=$JDBC_DATABASE_URL2 \
+            --build-arg JDBC_USERNAME=$JDBC_USERNAME \
+            --build-arg JDBC_PASSWORD=$JDBC_PASSWORD \
+            --build-arg APP_TOKEN_ISSUER=$APP_TOKEN_ISSUER \
+            --build-arg APP_SECRET_KEY=$APP_SECRET_KEY \
+            --build-arg MOTOR_API_URL=$MOTOR_API_URL \
+            --build-arg MOTOR_API_KEY=$MOTOR_API_KEY \
+            .
           docker save $IMAGE_TAG > backend-client.tar
 
       - name: Upload image artifact
